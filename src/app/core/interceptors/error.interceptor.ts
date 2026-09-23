@@ -1,23 +1,30 @@
 import { HttpInterceptorFn, HttpErrorResponse } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { Router } from '@angular/router';
-import { catchError, from, map, of, switchMap, tap, throwError, Observable } from 'rxjs';
+import { catchError, from, map, of, switchMap, tap, throwError, timeout, TimeoutError, Observable } from 'rxjs';
 import { AuthService } from '../services/auth.service';
 import { AppToastService } from '../services/toast.service';
 import { defaultMessageFor, extractMessage, isBackgroundRequest } from '../utils/http-error';
 
+/** Plain JSON/text calls should fail fast on a dead connection. */
+const DEFAULT_TIMEOUT_MS = 20_000;
+/** File uploads (supplier docs, listing images, proof-of-return photos) need more room on slow mobile data. */
+const UPLOAD_TIMEOUT_MS = 60_000;
+
 /**
  * Every failed request passes through here:
- *  1. an expired session (401 from a protected API) clears the session and opens the login page;
- *  2. the error is normalised so `err.error.message` is ALWAYS a friendly sentence - even when the server was
+ *  1. a request that hangs past its timeout is turned into a 408, same as the API returning one itself;
+ *  2. an expired session (401 from a protected API) clears the session and opens the login page;
+ *  3. the error is normalised so `err.error.message` is ALWAYS a friendly sentence - even when the server was
  *     unreachable, timed out, or the failed request was a download (Blob body) - so every page that shows
  *     `err.error.message` shows a consistent, readable message;
- *  3. system-level failures (no connection, server errors, timeouts, expired session) also raise a toast.
+ *  4. system-level failures (no connection, server errors, timeouts, expired session) also raise a toast.
  */
 export const errorInterceptor: HttpInterceptorFn = (req, next) => {
   const auth = inject(AuthService);
   const router = inject(Router);
   const toast = inject(AppToastService);
+  const timeoutMs = req.body instanceof FormData ? UPLOAD_TIMEOUT_MS : DEFAULT_TIMEOUT_MS;
 
   const normalise = (err: HttpErrorResponse): Observable<HttpErrorResponse> => {
     const build = (body: any): HttpErrorResponse => {
@@ -36,7 +43,11 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
   };
 
   return next(req).pipe(
-    catchError((err: HttpErrorResponse) => {
+    timeout(timeoutMs),
+    catchError((rawErr: HttpErrorResponse | TimeoutError) => {
+      const err = rawErr instanceof TimeoutError
+        ? new HttpErrorResponse({ error: null, status: 408, statusText: 'Request Timeout', url: req.url })
+        : rawErr;
       const isAuthEndpoint = /\/auth\//.test(req.url) || /\/login/.test(req.url);
       let sessionExpired = false;
       if (err.status === 401 && !isAuthEndpoint && auth.isLoggedIn) {
