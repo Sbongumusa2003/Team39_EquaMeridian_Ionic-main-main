@@ -1,0 +1,20 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start"><ion-back-button defaultHref="/tabs/account"></ion-back-button></ion-buttons>
+    <ion-title>Help & Support</ion-title>
+  </ion-toolbar>
+</ion-header>
+<ion-content class="ion-padding">
+  @if (loading) { <div class="center"><ion-spinner></ion-spinner></div> }
+  @else {
+    <ion-accordion-group>
+      @for (f of faqs; track $index) {
+        <ion-accordion>
+          <ion-item slot="header"><ion-label>{{ f.q || f.question || f.title }}</ion-label></ion-item>
+          <div class="ion-padding" slot="content">{{ f.a || f.answer || f.body }}</div>
+        </ion-accordion>
+      }
+    </ion-accordion-group>
+    <p class="contact">Need more help? Message support from Messages or visit <a href="https://www.equameridianholdings.com/" target="_blank">equameridianholdings.com</a>.</p>
+  }
+</ion-content>

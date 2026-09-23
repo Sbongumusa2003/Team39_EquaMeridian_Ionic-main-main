@@ -1,0 +1,30 @@
+<ion-header><ion-toolbar>
+  <ion-buttons slot="start"><ion-back-button defaultHref="/tabs/browse" text=""></ion-back-button></ion-buttons>
+  <ion-title>Supplier</ion-title>
+</ion-toolbar></ion-header>
+<ion-content>
+  @if (loading) {
+    <div class="page-pad"><div class="sk" style="height:130px;margin-bottom:14px"></div><div class="grid-2" style="padding:0"><div class="sk" style="height:240px"></div><div class="sk" style="height:240px"></div></div></div>
+  } @else if (!store) {
+    <app-empty-state icon="cloud-offline-outline" title="Supplier unavailable" [message]="error" actionLabel="Try again" (action)="load()"></app-empty-state>
+  } @else {
+    <div class="head">
+      <div class="logo">{{ (store.companyName || store.supplierName).charAt(0).toUpperCase() }}</div>
+      <h1>{{ store.companyName || store.supplierName }}</h1>
+      @if (store.locationSummary) { <p class="loc"><ion-icon name="location-outline"></ion-icon>{{ store.locationSummary }}</p> }
+      <div class="badges">
+        @if (store.verified) { <span class="pill ok"><ion-icon name="ribbon-outline"></ion-icon>Verified</span> }
+        <span class="pill mute"><ion-icon name="star"></ion-icon>{{ store.reviewCount ? (store.averageRating | number:'1.1-1') : 'New' }}{{ store.reviewCount ? ' (' + store.reviewCount + ')' : '' }}</span>
+        <span class="pill mute"><ion-icon name="cube-outline"></ion-icon>{{ store.activeListings }} listing{{ store.activeListings === 1 ? '' : 's' }}</span>
+      </div>
+    </div>
+    <div class="section-head"><h2>Machinery</h2></div>
+    @if (store.listings.length) {
+      <div class="grid-2">
+        @for (l of store.listings; track l.listingID) {
+          <app-product-card [listing]="l" [wished]="wishlist.isWishlisted(l.listingID)" (wishToggle)="toggleWish($event)"></app-product-card>
+        }
+      </div>
+    } @else { <app-empty-state icon="cube-outline" title="No active listings" message="This supplier has nothing available right now."></app-empty-state> }
+  }
+</ion-content>

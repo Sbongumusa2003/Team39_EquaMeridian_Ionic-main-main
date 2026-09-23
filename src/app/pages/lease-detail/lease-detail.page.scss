@@ -1,0 +1,15 @@
+h1 { margin:0; font-size:1.1rem; font-weight:800; line-height:1.25; } .top { align-items:flex-start; }
+.no { display:block; margin-top:6px; font-size:.78rem; color:var(--eq-muted); font-weight:600; }
+.spec { margin:6px 0 0; font-size:.86rem; color:var(--eq-ink-2); }
+.ch { margin:0 0 10px; font-size:.95rem; font-weight:800; } .pad-h { padding:14px 16px 4px; }
+.sig { display:flex; gap:12px; align-items:center; padding:8px 0; }
+.sig ion-icon { font-size:26px; color:#c9c4b6; } .sig.on ion-icon { color:var(--eq-ok); }
+.sig strong { display:block; font-size:.9rem; } .sig span { font-size:.78rem; color:var(--eq-muted); }
+.terms { overflow:hidden; padding-bottom:4px; }
+.terms details { border-top:1px solid var(--eq-line); }
+.terms summary { list-style:none; display:flex; justify-content:space-between; align-items:center; padding:14px 16px; font-weight:700; font-size:.9rem; cursor:pointer; }
+.terms summary::-webkit-details-marker { display:none; }
+.terms details[open] summary ion-icon { transform:rotate(180deg); }
+.terms p { margin:0; padding:0 16px 16px; font-size:.84rem; line-height:1.55; color:var(--eq-ink-2); white-space:pre-line; }
+.sign ion-checkbox { display:block; margin-bottom:12px; font-size:.9rem; }
+.nm { display:block; margin:6px 0 14px; }

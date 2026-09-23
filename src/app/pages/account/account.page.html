@@ -1,0 +1,39 @@
+<ion-header>
+  <ion-toolbar><ion-title>Account</ion-title></ion-toolbar>
+</ion-header>
+<ion-content>
+  @if (auth.isLoggedIn) {
+    <div class="me">
+      <div class="av">{{ initial }}</div>
+      <div class="grow"><h2>{{ auth.fullName }}</h2><span class="role">{{ roleLabel }}</span></div>
+    </div>
+
+    @if (auth.role === 'admin') {
+      <div class="admin"><ion-icon name="desktop-outline"></ion-icon><p>Administrator tools live in the EquaMeridian web app. This app is for contractors and suppliers.</p></div>
+    }
+
+    @for (s of sections; track s.title) {
+      <div class="section-title">{{ s.title }}</div>
+      <div class="eq-card menu">
+        @for (r of s.rows; track r.label) {
+          <a class="row" [routerLink]="r.link"><span class="ic"><ion-icon [name]="r.icon"></ion-icon></span><span class="lb">{{ r.label }}</span><ion-icon name="chevron-forward-outline" class="chev"></ion-icon></a>
+        }
+      </div>
+    }
+
+    <div class="page-pad"><ion-button expand="block" fill="outline" color="danger" (click)="logout()"><ion-icon slot="start" name="log-out-outline"></ion-icon>Sign out</ion-button></div>
+  } @else {
+    <div class="guest">
+      <div class="av big">EM</div>
+      <h2>Welcome to EquaMeridian Hub</h2>
+      <p>Sign in to book equipment, manage listings, and track payments.</p>
+      <ion-button expand="block" class="btn-gold big" routerLink="/auth/login">Sign in</ion-button>
+      <ion-button expand="block" fill="outline" routerLink="/auth/register">Create an account</ion-button>
+    </div>
+    <div class="eq-card menu" style="margin:0 16px">
+      @for (s of sections; track s.title) { @for (r of s.rows; track r.label) {
+        <a class="row" [routerLink]="r.link"><span class="ic"><ion-icon [name]="r.icon"></ion-icon></span><span class="lb">{{ r.label }}</span><ion-icon name="chevron-forward-outline" class="chev"></ion-icon></a>
+      } }
+    </div>
+  }
+</ion-content>

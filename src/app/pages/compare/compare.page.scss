@@ -1,0 +1,9 @@
+.scroller { overflow-x:auto; padding:12px 0 24px; }
+table { border-collapse:separate; border-spacing:0; min-width:100%; background:#fff; }
+th, td { padding:10px 10px; font-size:.82rem; border-bottom:1px solid var(--eq-line); text-align:left; vertical-align:top; min-width:132px; }
+.lbl { position:sticky; left:0; background:#faf9f6; min-width:96px; max-width:96px; font-weight:700; color:var(--eq-muted); z-index:1; border-right:1px solid var(--eq-line); }
+.col { text-align:left; background:#fff; }
+.col img, .col .ph { width:100%; aspect-ratio:4/3; object-fit:cover; border-radius:10px; background:#efece5; display:block; margin-bottom:8px; }
+.t { display:block; font-weight:800; font-size:.86rem; line-height:1.25; margin-bottom:4px; }
+.p { display:block; font-size:.95rem; margin-bottom:6px; }
+.act td { border-bottom:0; } .act ion-button { margin:0; --padding-start:10px; --padding-end:10px; }

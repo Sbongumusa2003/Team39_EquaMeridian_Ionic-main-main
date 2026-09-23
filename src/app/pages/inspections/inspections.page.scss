@@ -1,0 +1,11 @@
+.list { padding-top:12px; }
+.ins { display:flex; flex-direction:column; gap:3px; width:100%; padding:14px; margin-bottom:10px; text-align:left; font-family:inherit; color:inherit; cursor:pointer; }
+.who { font-size:.82rem; color:var(--eq-ink-2); }
+.when { display:flex; align-items:center; gap:5px; font-size:.78rem; color:var(--eq-muted); }
+.out { margin-top:6px; font-size:.8rem; font-weight:700; color:var(--eq-ok); } .out.fail { color:var(--eq-bad); }
+.sheet { padding:20px 16px 28px; } .sheet h2 { margin:0 0 4px; font-size:1.15rem; font-weight:800; }
+.sub { margin:0 0 10px; color:var(--eq-muted); font-size:.86rem; }
+.f { display:block; margin:0 0 12px; } .sheet h2 + .f { margin-top:14px; }
+.sh { margin:16px 0 10px; font-size:.95rem; font-weight:800; }
+.res { margin:14px 0 0; } .res p { margin:6px 0 0; font-size:.86rem; }
+.opt-grid { margin-bottom:12px; }

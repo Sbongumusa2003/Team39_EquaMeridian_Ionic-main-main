@@ -1,0 +1,26 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start"><ion-back-button defaultHref="/tabs/account" text=""></ion-back-button></ion-buttons>
+    <ion-title>Disputes</ion-title>
+  </ion-toolbar>
+</ion-header>
+<ion-content>
+  <ion-refresher slot="fixed" (ionRefresh)="load($event)"><ion-refresher-content></ion-refresher-content></ion-refresher>
+  @if (loading) {
+    <div class="page-pad">@for (i of [1,2]; track i) { <div class="sk" style="height:84px;margin-bottom:10px"></div> }</div>
+  } @else if (error) {
+    <app-empty-state icon="cloud-offline-outline" title="Couldn't load disputes" [message]="error" actionLabel="Try again" (action)="load()"></app-empty-state>
+  } @else if (!items.length) {
+    <app-empty-state icon="alert-circle-outline" title="No disputes" message="If something goes wrong with a hire, raise a dispute from the booking screen."></app-empty-state>
+  } @else {
+    <div class="page-pad">
+      @for (d of items; track d.disputeID) {
+        <a class="eq-card dp" [routerLink]="['/tabs/disputes', d.disputeID]">
+          <div class="between"><strong>{{ d.listingTitle || ('Dispute #' + d.disputeID) }}</strong><app-status-pill [status]="d.status"></app-status-pill></div>
+          <span class="rc">{{ d.reasonCategory }}</span>
+          <span class="ts">{{ auth.role === 'supplier' ? d.contractorName : d.supplierName }} · Raised {{ d.raisedDate | date:'d MMM yyyy' }}</span>
+        </a>
+      }
+    </div>
+  }
+</ion-content>

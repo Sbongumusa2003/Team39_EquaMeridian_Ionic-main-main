@@ -1,0 +1,68 @@
+.auth-wrap { max-width: 480px; margin: 0 auto; padding-bottom: 32px; }
+.auth-header { margin-bottom: 16px; }
+.auth-header h1 { margin: 0 0 4px; font-size: 1.5rem; font-weight: 700; }
+.auth-header p { margin: 0; color: var(--eq-text-muted, #6c757d); }
+
+.auth-form ion-item { --background: transparent; margin-bottom: 4px; }
+.hint { display: block; margin: -4px 12px 12px; font-size: 0.75rem; color: var(--eq-text-muted, #6c757d); }
+
+.docs-section {
+  margin: 16px 0;
+  padding: 14px;
+  border: 1px solid var(--eq-border, #e9e6df);
+  border-radius: 12px;
+  background: var(--eq-surface, #fff);
+}
+.docs-section h2 { margin: 0 0 6px; font-size: 1rem; font-weight: 700; }
+.docs-hint { margin: 0 0 12px; font-size: 0.8rem; color: var(--eq-text-muted, #6c757d); line-height: 1.4; }
+
+.required-list { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 12px; font-size: 0.75rem; }
+.req-chip {
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(217, 52, 43, 0.1);
+  color: #d9342b;
+  font-weight: 600;
+}
+.req-chip.covered {
+  background: rgba(26, 138, 74, 0.12);
+  color: #1a8a4a;
+}
+
+.doc-row {
+  margin-bottom: 12px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--eq-border, #eee);
+}
+.doc-row.has-error { border-color: rgba(217, 52, 43, 0.35); }
+.file-row { display: flex; align-items: center; gap: 8px; padding: 0 8px; flex-wrap: wrap; }
+.file-btn {
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px dashed var(--gold, #c5a059);
+  color: var(--eq-text, #0a0a0a);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.row-error { margin: 4px 12px 0; font-size: 0.78rem; color: #d9342b; }
+.add-doc-btn { margin-top: 4px; --border-color: var(--gold, #c5a059); --color: var(--gold, #c5a059); }
+
+.terms-item { margin: 12px 0; --background: transparent; }
+.error-msg { margin: 8px 4px; font-size: 0.9rem; }
+.progress-label { text-align: center; font-size: 0.8rem; color: var(--eq-text-muted); margin: 4px 0 12px; }
+.submit-btn {
+  margin-top: 8px;
+  --background: var(--gold, #c5a059);
+  --color: #111;
+  font-weight: 700;
+}
+.auth-links { text-align: center; margin-top: 16px; }
+.auth-links a { color: var(--gold, #c5a059); text-decoration: none; font-weight: 600; }
+.center-row { display: flex; justify-content: center; padding: 12px; }

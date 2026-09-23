@@ -1,0 +1,58 @@
+<ion-header><ion-toolbar>
+  <ion-buttons slot="start"><ion-back-button defaultHref="/tabs/quotations" text=""></ion-back-button></ion-buttons>
+  <ion-title>Quotation #{{ id }}</ion-title>
+</ion-toolbar></ion-header>
+<ion-content>
+  @if (loading) {
+    <div class="page-pad"><div class="sk" style="height:130px;margin-bottom:12px"></div><div class="sk" style="height:220px"></div></div>
+  } @else if (!q) {
+    <app-empty-state icon="cloud-offline-outline" title="Quotation unavailable" [message]="error" actionLabel="Try again" (action)="load()"></app-empty-state>
+  } @else {
+    <div class="page-pad stack">
+      <div class="eq-card pad">
+        <div class="between top"><h1>{{ q.listingTitle }}</h1><app-status-pill [status]="q.status"></app-status-pill></div>
+        <span class="sub">{{ q.supplierName }}</span>
+        @if (q.quoteValidUntil) { <span class="valid">Valid until {{ q.quoteValidUntil | date:'d MMM yyyy' }}</span> }
+      </div>
+
+      @if (q.dailyRateZAR) {
+        <div class="eq-card pad price-card">
+          <span class="lbl">Quoted daily rate</span>
+          <div class="big price">{{ q.dailyRateZAR | zar:0 }}<small>/day</small></div>
+          @if (q.estimatedTotal) { <div class="est">Estimated total <strong>{{ q.estimatedTotal | zar:0 }}</strong></div> }
+        </div>
+      }
+
+      <div class="eq-card pad">
+        <h3 class="ch">Your request</h3>
+        <div class="kv"><span>Period</span><span>{{ q.rentalStartDate | date:'d MMM' }} – {{ q.rentalEndDate | date:'d MMM yyyy' }}@if (days) { ({{ days }}d) }</span></div>
+        <div class="kv"><span>Quantity</span><span>{{ q.quantity }}</span></div>
+        <div class="kv"><span>Hire type</span><span>{{ q.hireType }}</span></div>
+        <div class="kv"><span>Fulfilment</span><span>{{ q.fulfillmentMethod }}</span></div>
+        @if (q.deliveryAddress) { <div class="kv"><span>Address</span><span>{{ q.deliveryAddress }}</span></div> }
+        @if (q.weeklyRateZAR) { <div class="kv"><span>Weekly rate</span><span>{{ q.weeklyRateZAR | zar:0 }}</span></div> }
+        @if (q.deliveryFee != null) { <div class="kv"><span>Delivery fee</span><span>{{ q.deliveryFee | zar:0 }}</span></div> }
+        @if (q.specialRequirements) { <div class="kv"><span>Requirements</span><span>{{ q.specialRequirements }}</span></div> }
+      </div>
+
+      @if (q.notesToCustomer) { <div class="eq-card pad"><h3 class="ch">Note from supplier</h3><p class="note">{{ q.notesToCustomer }}</p></div> }
+
+      @if (q.statusHistory.length) {
+        <div class="eq-card pad">
+          <h3 class="ch">History</h3>
+          <div class="steps-v">
+            @for (h of q.statusHistory; track $index; let last = $last) {
+              <div class="step-v done" [class.current]="last"><div class="dot"></div><div class="txt"><strong>{{ h.status }}</strong><span>{{ h.date | date:'d MMM yyyy, HH:mm' }}</span></div></div>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  }
+</ion-content>
+@if (q && (q.canAccept || q.canReject)) {
+  <ion-footer class="cta-footer ion-no-border"><ion-toolbar><div class="cta-bar">
+    @if (q.canReject) { <ion-button fill="outline" class="grow-0" (click)="reject()" [disabled]="processing">Decline</ion-button> }
+    @if (q.canAccept) { <ion-button class="btn-gold big" (click)="accept()" [disabled]="processing">@if (processing) { <ion-spinner name="crescent"></ion-spinner> } @else { Accept quotation }</ion-button> }
+  </div></ion-toolbar></ion-footer>
+}

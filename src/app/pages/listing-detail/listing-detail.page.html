@@ -1,0 +1,119 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start"><ion-back-button defaultHref="/tabs/browse" text=""></ion-back-button></ion-buttons>
+    <ion-title>Machine details</ion-title>
+    <ion-buttons slot="end"><app-header-actions></app-header-actions></ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  @if (loading) {
+    <div class="sk" style="height:280px;border-radius:0"></div>
+    <div class="page-pad">
+      <div class="sk" style="height:26px;width:75%;margin-bottom:12px"></div>
+      <div class="sk" style="height:18px;width:45%;margin-bottom:22px"></div>
+      <div class="sk" style="height:110px"></div>
+    </div>
+  } @else if (error || !listing) {
+    <app-empty-state icon="cloud-offline-outline" title="Listing unavailable" [message]="error || 'This listing could not be found.'"
+      actionLabel="Try again" (action)="load()"></app-empty-state>
+  } @else {
+    <!-- gallery -->
+    <div class="gallery">
+      @if (images().length) {
+        <div class="slides" (scroll)="onGallery($event)">
+          @for (src of images(); track $index) { <img [src]="src" [alt]="listing.listingTitle" /> }
+        </div>
+        @if (images().length > 1) {
+          <span class="count">{{ currentImage + 1 }} / {{ images().length }}</span>
+          <div class="dots">@for (s of images(); track $index) { <i [class.on]="$index === currentImage"></i> }</div>
+        }
+      } @else {
+        <div class="no-img"><ion-icon name="construct-outline"></ion-icon><span>No photos yet</span></div>
+      }
+      <button type="button" class="heart" [class.on]="wished" (click)="toggleWish()" aria-label="Save to wishlist">
+        <ion-icon [name]="wished ? 'heart' : 'heart-outline'"></ion-icon>
+      </button>
+    </div>
+
+    <div class="sheet">
+      <!-- headline -->
+      <div class="tags">
+        @if (isQuote) { <span class="pill warn">Quote required</span> } @else { <span class="pill ok">Fixed rate · book instantly</span> }
+        @if (soldOut) { <span class="pill bad">Fully booked</span> }
+        @else if (!isQuote) { <span class="pill mute">{{ listing.unitsAvailable }} of {{ listing.unitsOwned }} available</span> }
+      </div>
+      <h1>{{ listing.listingTitle }}</h1>
+      @if (listing.location) {
+        <p class="loc"><ion-icon name="location-outline"></ion-icon>{{ listing.location }}</p>
+      }
+
+      <!-- price -->
+      <div class="eq-card pad price-card">
+        <div>
+          <span class="lbl">Daily rate</span>
+          <div class="big price">{{ listing.dailyRateZAR | zar:0 }}<small>/day</small></div>
+        </div>
+        @if (listing.weeklyRateZAR) {
+          <div class="right">
+            <span class="lbl">Weekly</span>
+            <div class="mid price">{{ listing.weeklyRateZAR | zar:0 }}<small>/wk</small></div>
+          </div>
+        }
+      </div>
+
+      <!-- hire options -->
+      <div class="opts">
+        @if (listing.dryHireAvailable) { <span class="opt-chip"><ion-icon name="checkmark-circle-outline"></ion-icon>Dry hire</span> }
+        @if (listing.wetHireAvailable) {
+          <span class="opt-chip"><ion-icon name="water-outline"></ion-icon>Wet hire{{ listing.wetDailyRateZAR ? ' · ' + (listing.wetDailyRateZAR | zar:0) + '/day' : '' }}</span>
+        }
+        @if (listing.deliveryAvailable) {
+          <span class="opt-chip"><ion-icon name="car-outline"></ion-icon>Delivery{{ listing.deliveryFeeZAR ? ' · ' + (listing.deliveryFeeZAR | zar:0) : '' }}</span>
+        }
+        @if (listing.pickupAvailable) { <span class="opt-chip"><ion-icon name="cube-outline"></ion-icon>Pickup</span> }
+      </div>
+
+      <!-- supplier -->
+      <a class="eq-card supplier" [routerLink]="['/tabs/storefront', listing.supplierID]">
+        <div class="av"><ion-icon name="business-outline"></ion-icon></div>
+        <div class="grow"><small>Supplied by</small><strong>{{ listing.supplierName }}</strong></div>
+        <ion-icon name="chevron-forward-outline" class="muted"></ion-icon>
+      </a>
+
+      <!-- specs -->
+      @if (listing.makeBrand || listing.model || listing.year || listing.operatingWeight || listing.enginePower) {
+        <h2 class="h2">Specifications</h2>
+        <div class="eq-card pad">
+          @if (listing.makeBrand) { <div class="kv"><span>Make</span><span>{{ listing.makeBrand }}</span></div> }
+          @if (listing.model) { <div class="kv"><span>Model</span><span>{{ listing.model }}</span></div> }
+          @if (listing.year) { <div class="kv"><span>Year</span><span>{{ listing.year }}</span></div> }
+          @if (listing.operatingWeight) { <div class="kv"><span>Operating weight</span><span>{{ listing.operatingWeight }}</span></div> }
+          @if (listing.enginePower) { <div class="kv"><span>Engine power</span><span>{{ listing.enginePower }}</span></div> }
+        </div>
+      }
+
+      @if (listing.description) {
+        <h2 class="h2">About this machine</h2>
+        <p class="desc">{{ listing.description }}</p>
+      }
+
+      @if (!isContractorOrGuest) {
+        <div class="note"><ion-icon name="information-circle-outline"></ion-icon>You're signed in as {{ auth.role }}. Use a contractor account to hire equipment.</div>
+      }
+    </div>
+  }
+</ion-content>
+
+@if (listing && isContractorOrGuest) {
+  <ion-footer class="cta-footer ion-no-border">
+    <ion-toolbar>
+      <div class="cta-bar">
+        <div class="cta-price"><small>From</small><strong>{{ listing.dailyRateZAR | zar:0 }}<span class="per">/day</span></strong></div>
+        <ion-button class="btn-gold big" [disabled]="soldOut" (click)="primaryAction()">
+          {{ soldOut ? 'Fully booked' : isQuote ? 'Request a quote' : 'Book now' }}
+        </ion-button>
+      </div>
+    </ion-toolbar>
+  </ion-footer>
+}

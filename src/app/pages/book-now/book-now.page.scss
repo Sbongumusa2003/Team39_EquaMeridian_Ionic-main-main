@@ -1,0 +1,10 @@
+.summary { display:flex; gap:12px; padding:10px; align-items:center; margin-bottom:18px; }
+.summary img, .thumb-ph { width:72px; height:72px; border-radius:12px; object-fit:cover; background:#efece5; flex:0 0 72px; }
+.summary .grow { display:flex; flex-direction:column; gap:2px; min-width:0; }
+.summary strong { font-size:.95rem; line-height:1.25; }
+.summary span { font-size:.78rem; color:var(--eq-muted); }
+.summary .price { color:var(--eq-ink); font-size:.95rem; }
+.small { font-size:.8rem; }
+.opt ion-icon { font-size:22px; color:var(--eq-gold-dark); margin-bottom:4px; }
+.addr { margin-top:12px; }
+.est .kv { padding:2px 0; border:0; }

@@ -1,0 +1,112 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <div class="brand" slot="start">
+      <img src="assets/brand/logo-mark-128.png" alt="" />
+      <span>Equa<b>Meridian</b></span>
+    </div>
+    <ion-buttons slot="end">
+      @if (auth.isLoggedIn) {
+        <app-header-actions></app-header-actions>
+      } @else {
+        <ion-button routerLink="/auth/login" fill="clear">Sign in</ion-button>
+      }
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-refresher slot="fixed" (ionRefresh)="load($event)"><ion-refresher-content></ion-refresher-content></ion-refresher>
+
+  <!-- search entry -->
+  <div class="search-wrap">
+    <a class="search-pill" routerLink="/tabs/browse" [queryParams]="{ focus: 1 }">
+      <ion-icon name="search-outline"></ion-icon>
+      <span>Search excavators, loaders, generators…</span>
+    </a>
+  </div>
+
+  <!-- hero -->
+  <section class="hero">
+    <img src="assets/images/hero-excavator.jpg" alt="" />
+    <div class="shade"></div>
+    <div class="copy">
+      @if (auth.isLoggedIn && firstName) {
+        <span class="eyebrow">Welcome back, {{ firstName }}</span>
+      } @else {
+        <span class="eyebrow">Equipment hire marketplace</span>
+      }
+      <h1>Hire the right machine, without the paperwork.</h1>
+      <p>Verified suppliers · transparent rates · digital leases</p>
+      <ion-button routerLink="/tabs/browse" class="btn-gold">
+        Browse machinery <ion-icon slot="end" name="arrow-forward-outline"></ion-icon>
+      </ion-button>
+    </div>
+  </section>
+
+  <!-- categories -->
+  @if (categories.length) {
+    <div class="section-head"><h2>Shop by category</h2><a routerLink="/tabs/browse">See all</a></div>
+    <div class="chip-scroll">
+      @for (c of categories; track c.categoryID) {
+        <a class="chip" routerLink="/tabs/browse" [queryParams]="{ category: c.categoryID }">{{ c.name }}</a>
+      }
+    </div>
+  }
+
+  <!-- contractor shortcuts -->
+  @if (auth.role === 'contractor') {
+    <div class="section-head"><h2>Your activity</h2></div>
+    <div class="tile-grid">
+      <a class="tile" routerLink="/tabs/bookings"><div class="ico"><ion-icon name="calendar-outline"></ion-icon></div><div class="lbl">My</div><div class="strong">Bookings</div></a>
+      <a class="tile" routerLink="/tabs/quotations"><div class="ico"><ion-icon name="document-text-outline"></ion-icon></div><div class="lbl">My</div><div class="strong">Quotations</div></a>
+      <a class="tile" routerLink="/tabs/invoices"><div class="ico"><ion-icon name="receipt-outline"></ion-icon></div><div class="lbl">My</div><div class="strong">Invoices</div></a>
+      <a class="tile" routerLink="/tabs/wishlist"><div class="ico"><ion-icon name="heart-outline"></ion-icon></div><div class="lbl">Saved</div><div class="strong">Wishlist</div></a>
+    </div>
+  }
+
+  <!-- featured -->
+  <div class="section-head"><h2>Featured machinery</h2><a routerLink="/tabs/browse">View all</a></div>
+  @if (loadingFeatured) {
+    <div class="rail">
+      @for (i of [1,2,3]; track i) { <div class="sk" style="height:250px;border-radius:16px"></div> }
+    </div>
+  } @else if (featured.length) {
+    <div class="rail">
+      @for (l of featured; track l.listingID) {
+        <app-product-card [listing]="l" [wished]="wishlist.isWishlisted(l.listingID)" (wishToggle)="toggleWish($event)"></app-product-card>
+      }
+    </div>
+  }
+
+  <!-- how it works -->
+  <div class="section-head"><h2>How hiring works</h2></div>
+  <div class="how">
+    @for (s of steps; track s.title; let i = $index) {
+      <div class="how-row">
+        <div class="how-ico"><ion-icon [name]="s.icon"></ion-icon></div>
+        <div><strong>{{ i + 1 }}. {{ s.title }}</strong><p>{{ s.body }}</p></div>
+      </div>
+    }
+  </div>
+
+  <!-- trust -->
+  <div class="trust">
+    <div><ion-icon name="ribbon-outline"></ion-icon><span>Verified suppliers</span></div>
+    <div><ion-icon name="shield-checkmark-outline"></ion-icon><span>Digital leases</span></div>
+    <div><ion-icon name="card-outline"></ion-icon><span>Secure payments</span></div>
+  </div>
+
+  <!-- supplier CTA -->
+  @if (!auth.isLoggedIn) {
+    <div class="supplier-cta">
+      <ion-icon name="business-outline"></ion-icon>
+      <div>
+        <strong>Own equipment?</strong>
+        <p>List it on EquaMeridian and reach contractors across South Africa.</p>
+      </div>
+      <ion-button fill="outline" size="small" routerLink="/auth/register">Register</ion-button>
+    </div>
+  }
+
+  <p class="foot"><a href="https://www.equameridianholdings.com/" target="_blank" rel="noopener noreferrer">equameridianholdings.com ↗</a></p>
+</ion-content>

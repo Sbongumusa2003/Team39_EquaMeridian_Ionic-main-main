@@ -1,0 +1,34 @@
+<ion-header><ion-toolbar>
+  <ion-buttons slot="start"><ion-back-button defaultHref="/tabs/account" text=""></ion-back-button></ion-buttons>
+  <ion-title>My documents</ion-title>
+</ion-toolbar></ion-header>
+<ion-content>
+  <ion-refresher slot="fixed" (ionRefresh)="load($event)"><ion-refresher-content></ion-refresher-content></ion-refresher>
+  <div class="page-pad">
+    <div class="eq-card pad up">
+      <h3>Upload a document</h3>
+      <p>Keep your verification documents up to date. PDF, JPG or PNG.</p>
+      <ion-select class="field" label="Document type" labelPlacement="floating" fill="outline" [(ngModel)]="uploadTypeId" interface="popover">
+        @for (t of types; track t.docTypeID) { <ion-select-option [value]="t.docTypeID">{{ t.typeName }}</ion-select-option> }
+      </ion-select>
+      <label class="file-btn" [class.off]="uploading || !uploadTypeId">
+        <input type="file" accept=".pdf,.jpg,.jpeg,.png" (change)="onFile($event)" [disabled]="uploading" hidden />
+        {{ uploading ? 'Uploading…' : 'Choose file & upload' }}
+      </label>
+    </div>
+
+    @if (loading) {
+      <div class="sk" style="height:70px;margin-top:12px"></div>
+    } @else if (!docs.length) {
+      <p class="empty">No documents uploaded yet.</p>
+    } @else {
+      <div class="section-title" style="margin:20px 4px 8px">Uploaded</div>
+      @for (d of docs; track d.docID) {
+        <div class="eq-card dc">
+          <div class="grow"><strong>{{ d.docName }}</strong><span>{{ d.uploadedDate | date:'d MMM yyyy' }}</span></div>
+          <app-status-pill [status]="d.verificationStatus"></app-status-pill>
+        </div>
+      }
+    }
+  </div>
+</ion-content>

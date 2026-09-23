@@ -1,0 +1,6 @@
+h1 { margin:0; font-size:1.08rem; font-weight:800; line-height:1.25; } .top { align-items:flex-start; }
+.sub { display:block; margin-top:5px; font-size:.82rem; color:var(--eq-muted); }
+.ch { margin:0 0 10px; font-size:.95rem; font-weight:800; }
+.body { margin:0 0 6px; font-size:.9rem; line-height:1.55; white-space:pre-line; }
+.res { background:#f2faf5; border-color:#cbe8d5; }
+.ev { display:flex; flex-wrap:wrap; gap:8px; } .ev a { display:inline-flex; align-items:center; gap:6px; background:var(--eq-mute-bg); border-radius:999px; padding:7px 12px; font-size:.8rem; font-weight:700; color:var(--eq-ink); text-decoration:none; }

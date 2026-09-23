@@ -1,0 +1,49 @@
+<ion-header><ion-toolbar>
+  <ion-buttons slot="start"><ion-back-button defaultHref="/tabs/disputes" text=""></ion-back-button></ion-buttons>
+  <ion-title>Dispute #{{ id }}</ion-title>
+</ion-toolbar></ion-header>
+<ion-content>
+  @if (loading) {
+    <div class="page-pad"><div class="sk" style="height:110px;margin-bottom:12px"></div><div class="sk" style="height:200px"></div></div>
+  } @else if (!d) {
+    <app-empty-state icon="cloud-offline-outline" title="Dispute unavailable" [message]="error" actionLabel="Try again" (action)="load()"></app-empty-state>
+  } @else {
+    <div class="page-pad stack">
+      <div class="eq-card pad">
+        <div class="between top"><h1>{{ d.reasonCategory }}</h1><app-status-pill [status]="d.status"></app-status-pill></div>
+        <span class="sub">{{ d.listingTitle }}</span>
+        <span class="sub">Raised {{ d.raisedDate | date:'d MMM yyyy' }}</span>
+      </div>
+
+      @if (resolved) {
+        <div class="eq-card pad res">
+          <h3 class="ch">Resolution</h3>
+          @if (d.resolutionType) { <div class="kv"><span>Outcome</span><span>{{ d.resolutionType }}</span></div> }
+          @if (d.resolvedDate) { <div class="kv"><span>Resolved</span><span>{{ d.resolvedDate | date:'d MMM yyyy' }}</span></div> }
+          @if (d.resolutionNotes) { <p class="body">{{ d.resolutionNotes }}</p> }
+        </div>
+      }
+
+      <div class="eq-card pad">
+        <h3 class="ch">What happened</h3>
+        <p class="body">{{ d.complaintDescription }}</p>
+        @if (d.desiredResolution) { <div class="kv"><span>Desired outcome</span><span>{{ d.desiredResolution }}</span></div> }
+      </div>
+
+      <div class="eq-card pad">
+        <h3 class="ch">Booking</h3>
+        <div class="kv"><span>Reference</span><span>{{ d.bookingReference }}</span></div>
+        <div class="kv"><span>Amount</span><span>{{ d.bookingAmount | zar }}</span></div>
+        <div class="kv"><span>Contractor</span><span>{{ d.contractorName }}</span></div>
+        <div class="kv"><span>Supplier</span><span>{{ d.supplierName }}</span></div>
+      </div>
+
+      @if (d.evidenceUrls.length) {
+        <div class="eq-card pad">
+          <h3 class="ch">Evidence</h3>
+          <div class="ev">@for (u of d.evidenceUrls; track $index) { <a [href]="url(u)" target="_blank" rel="noopener"><ion-icon name="image-outline"></ion-icon>File {{ $index + 1 }}</a> }</div>
+        </div>
+      }
+    </div>
+  }
+</ion-content>

@@ -1,0 +1,24 @@
+<ion-header><ion-toolbar>
+  <ion-buttons slot="start"><ion-back-button defaultHref="/tabs/account" text=""></ion-back-button></ion-buttons>
+  <ion-title>My reviews</ion-title>
+</ion-toolbar></ion-header>
+<ion-content>
+  <ion-refresher slot="fixed" (ionRefresh)="load($event)"><ion-refresher-content></ion-refresher-content></ion-refresher>
+  @if (loading) {
+    <div class="page-pad">@for (i of [1,2]; track i) { <div class="sk" style="height:110px;margin-bottom:10px"></div> }</div>
+  } @else if (error) {
+    <div class="center"><p>{{ error }}</p><ion-button (click)="load()">Try again</ion-button></div>
+  } @else if (!items.length) {
+    <div class="center"><p>You haven't reviewed a hire yet.<br>Finished bookings can be reviewed from the booking screen.</p></div>
+  } @else {
+    <div class="page-pad">
+      @for (r of items; track r.reviewID) {
+        <div class="eq-card pad rv">
+          <div class="between"><strong>{{ r.title }}</strong><span class="stars">{{ stars(r.overallRating) }}</span></div>
+          <span class="lt">{{ r.listingTitle }}</span>
+          <p>{{ r.reviewText }}</p>
+        </div>
+      }
+    </div>
+  }
+</ion-content>

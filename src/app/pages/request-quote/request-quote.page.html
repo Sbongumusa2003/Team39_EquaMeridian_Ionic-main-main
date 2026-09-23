@@ -1,0 +1,56 @@
+<ion-header><ion-toolbar>
+  <ion-buttons slot="start"><ion-back-button defaultHref="/tabs/browse" text=""></ion-back-button></ion-buttons>
+  <ion-title>Request a quote</ion-title>
+</ion-toolbar></ion-header>
+<ion-content>
+  @if (loading) {
+    <div class="page-pad"><div class="sk" style="height:84px;margin-bottom:14px"></div><div class="sk" style="height:320px"></div></div>
+  } @else if (!listing) {
+    <div class="center"><p>{{ error }}</p></div>
+  } @else {
+    <div class="form-pad">
+      <div class="eq-card sum"><div class="grow"><strong>{{ listing.listingTitle }}</strong><span>{{ listing.supplierName }}</span><span class="hint">The supplier will reply with a price you can accept or decline.</span></div></div>
+
+      <div class="form-group">
+        <h3>Hire period</h3>
+        <div class="row-2">
+          <ion-input class="field" label="Start date" labelPlacement="floating" fill="outline" type="date" [(ngModel)]="startDate" [min]="minDate"></ion-input>
+          <ion-input class="field" label="End date" labelPlacement="floating" fill="outline" type="date" [(ngModel)]="endDate" [min]="startDate || minDate"></ion-input>
+        </div>
+        <ion-input class="field" label="Quantity" labelPlacement="floating" fill="outline" type="number" [(ngModel)]="quantity" min="1"></ion-input>
+      </div>
+
+      <div class="form-group">
+        <h3>Hire type</h3>
+        <div class="opt-grid">
+          @if (listing.dryHireAvailable !== false) { <button type="button" class="opt" [class.on]="hireType === 'Dry'" (click)="hireType = 'Dry'"><strong>Dry hire</strong><small>Machine only</small></button> }
+          @if (listing.wetHireAvailable) { <button type="button" class="opt" [class.on]="hireType === 'Wet'" (click)="hireType = 'Wet'"><strong>Wet hire</strong><small>With operator &amp; fuel</small></button> }
+        </div>
+      </div>
+
+      <div class="form-group">
+        <h3>Delivery</h3>
+        <div class="opt-grid">
+          <button type="button" class="opt" [class.on]="fulfillmentMethod === 'Supplier Delivery'" (click)="fulfillmentMethod = 'Supplier Delivery'"><strong>Delivery</strong><small>To your site</small></button>
+          <button type="button" class="opt" [class.on]="fulfillmentMethod === 'Contractor Pickup'" (click)="fulfillmentMethod = 'Contractor Pickup'"><strong>Pickup</strong><small>You collect</small></button>
+        </div>
+        @if (fulfillmentMethod === 'Supplier Delivery') {
+          <ion-textarea class="field top" label="Site address" labelPlacement="floating" fill="outline" rows="2" [(ngModel)]="deliveryAddress"></ion-textarea>
+        }
+      </div>
+
+      <div class="form-group">
+        <h3>Anything else?</h3>
+        <ion-textarea class="field" label="Special requirements (optional)" labelPlacement="floating" fill="outline" rows="3" [(ngModel)]="specialRequirements"></ion-textarea>
+        <ion-select class="field" label="Preferred contact" labelPlacement="floating" fill="outline" [(ngModel)]="preferredContact" interface="popover">
+          <ion-select-option value="Email">Email</ion-select-option><ion-select-option value="Phone">Phone</ion-select-option><ion-select-option value="Both">Both</ion-select-option>
+        </ion-select>
+      </div>
+
+      @if (error) { <div class="form-error">{{ error }}</div> }
+      <ion-button expand="block" class="btn-gold big" (click)="submit()" [disabled]="submitting">
+        @if (submitting) { <ion-spinner name="crescent"></ion-spinner> } @else { Send quote request }
+      </ion-button>
+    </div>
+  }
+</ion-content>

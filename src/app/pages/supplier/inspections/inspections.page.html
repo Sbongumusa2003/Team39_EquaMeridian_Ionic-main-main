@@ -1,0 +1,42 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start"><ion-back-button defaultHref="/tabs/supplier" text=""></ion-back-button></ion-buttons>
+    <ion-title>Inspections</ion-title>
+  </ion-toolbar>
+</ion-header>
+<ion-content>
+  <ion-refresher slot="fixed" (ionRefresh)="load($event)"><ion-refresher-content></ion-refresher-content></ion-refresher>
+  @if (loading) {
+    <div class="page-pad">@for (i of [1,2,3]; track i) { <div class="sk" style="height:80px;margin-bottom:12px"></div> }</div>
+  } @else if (error) {
+    <app-empty-state icon="cloud-offline-outline" title="Couldn't load inspections" [message]="error" actionLabel="Try again" (action)="load()"></app-empty-state>
+  } @else if (!items.length) {
+    <app-empty-state icon="clipboard-outline" title="No inspections" message="When a contractor requests a pre-hire inspection of one of your machines it will appear here."></app-empty-state>
+  } @else {
+    <div class="page-pad list">
+      @for (i of items; track i.inspectionID) {
+        <button type="button" class="eq-card ins" (click)="show(i)">
+          <div class="between"><strong>{{ i.machineryTitle }}</strong><app-status-pill [status]="i.status"></app-status-pill></div>
+          <span class="when"><ion-icon name="calendar-outline"></ion-icon>{{ i.scheduledDate | date:'EEE d MMM yyyy' }}</span>
+          @if (i.outcome) { <span class="out" [class.fail]="isFail(i.outcome)">Outcome: {{ i.outcome }}</span> }
+        </button>
+      }
+    </div>
+    <p class="fine">Contractors record the outcome after they inspect the machine.</p>
+  }
+  <ion-modal [isOpen]="open" (didDismiss)="open = false" [initialBreakpoint]="0.5" [breakpoints]="[0, 0.5, 0.9]">
+    <ng-template>
+      @if (selected) {
+        <div class="sheet">
+          <h2>{{ selected.machineryTitle }}</h2>
+          <p class="sub">Scheduled {{ selected.scheduledDate | date:'d MMM yyyy' }}</p>
+          <app-status-pill [status]="selected.status"></app-status-pill>
+          <div class="eq-card pad res">
+            @if (selected.outcome) { <strong>Outcome: {{ selected.outcome }}</strong> } @else { <strong>Outcome pending</strong> }
+            @if (selected.notes) { <p>{{ selected.notes }}</p> }
+          </div>
+        </div>
+      }
+    </ng-template>
+  </ion-modal>
+</ion-content>

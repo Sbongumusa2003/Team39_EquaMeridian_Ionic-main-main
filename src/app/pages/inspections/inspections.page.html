@@ -1,0 +1,65 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start"><ion-back-button defaultHref="/tabs/account" text=""></ion-back-button></ion-buttons>
+    <ion-title>Inspections</ion-title>
+    <ion-buttons slot="end"><ion-button (click)="openRequest()"><ion-icon slot="start" name="add-outline"></ion-icon>Request</ion-button></ion-buttons>
+  </ion-toolbar>
+</ion-header>
+<ion-content>
+  <ion-refresher slot="fixed" (ionRefresh)="load($event)"><ion-refresher-content></ion-refresher-content></ion-refresher>
+  @if (loading) {
+    <div class="page-pad">@for (i of [1,2,3]; track i) { <div class="sk" style="height:80px;margin-bottom:12px"></div> }</div>
+  } @else if (error) {
+    <app-empty-state icon="cloud-offline-outline" title="Couldn't load inspections" [message]="error" actionLabel="Try again" (action)="load()"></app-empty-state>
+  } @else if (!items.length) {
+    <app-empty-state icon="clipboard-outline" title="No inspections yet" message="Request a pre-hire inspection of any machine before you commit." actionLabel="Request inspection" (action)="openRequest()"></app-empty-state>
+  } @else {
+    <div class="page-pad list">
+      @for (i of items; track i.inspectionID) {
+        <button type="button" class="eq-card ins" (click)="open(i)">
+          <div class="between"><strong>{{ i.machineryTitle }}</strong><app-status-pill [status]="i.status"></app-status-pill></div>
+          <span class="who">{{ i.supplierName }}</span>
+          <span class="when"><ion-icon name="calendar-outline"></ion-icon>{{ i.scheduledDate | date:'EEE d MMM yyyy' }}</span>
+          @if (i.outcome) { <span class="out" [class.fail]="isFail(i.outcome)">Outcome: {{ i.outcome }}</span> }
+        </button>
+      }
+    </div>
+  }
+
+  <ion-modal [isOpen]="requestOpen" (didDismiss)="requestOpen = false" [initialBreakpoint]="0.62" [breakpoints]="[0, 0.62, 0.9]">
+    <ng-template>
+      <div class="sheet">
+        <h2>Request an inspection</h2>
+        <ion-select label="Machine" labelPlacement="floating" fill="outline" [(ngModel)]="reqListing" interface="popover" class="f">
+          @for (m of machinery; track m.listingID) { <ion-select-option [value]="m.listingID">{{ m.machineryTitle }} — {{ m.company }}</ion-select-option> }
+        </ion-select>
+        <ion-input type="date" label="Preferred date" labelPlacement="floating" fill="outline" [min]="minDate" [(ngModel)]="reqDate" class="f"></ion-input>
+        @if (reqError) { <div class="form-error">{{ reqError }}</div> }
+        <ion-button expand="block" class="btn-gold big" (click)="submitRequest()" [disabled]="requesting">{{ requesting ? 'Requesting…' : 'Request inspection' }}</ion-button>
+      </div>
+    </ng-template>
+  </ion-modal>
+
+  <ion-modal [isOpen]="outcomeOpen" (didDismiss)="outcomeOpen = false" [initialBreakpoint]="0.7" [breakpoints]="[0, 0.7, 0.95]">
+    <ng-template>
+      @if (selected) {
+        <div class="sheet">
+          <h2>{{ selected.machineryTitle }}</h2>
+          <p class="sub">{{ selected.supplierName }} · {{ selected.scheduledDate | date:'d MMM yyyy' }}</p>
+          <app-status-pill [status]="selected.status"></app-status-pill>
+          @if (selected.outcome) { <div class="eq-card pad res"><strong>Outcome: {{ selected.outcome }}</strong>@if (selected.notes) { <p>{{ selected.notes }}</p> }</div> }
+          @if (canConfirm) {
+            <h3 class="sh">Record the outcome</h3>
+            <div class="opt-grid">
+              <button type="button" class="opt" [class.on]="outcome === 'Pass'" (click)="outcome = 'Pass'"><strong>Pass</strong><small>Machine is as described</small></button>
+              <button type="button" class="opt" [class.on]="outcome === 'Fail'" (click)="outcome = 'Fail'"><strong>Fail</strong><small>Issues found</small></button>
+            </div>
+            <ion-textarea label="Notes (optional)" labelPlacement="floating" fill="outline" rows="3" [(ngModel)]="notes" class="f"></ion-textarea>
+            @if (outcomeError) { <div class="form-error">{{ outcomeError }}</div> }
+            <ion-button expand="block" class="btn-gold big" (click)="confirm()" [disabled]="confirming">{{ confirming ? 'Saving…' : 'Save outcome' }}</ion-button>
+          }
+        </div>
+      }
+    </ng-template>
+  </ion-modal>
+</ion-content>

@@ -1,0 +1,48 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-title>Supplier hub</ion-title>
+    <ion-buttons slot="end"><app-header-actions></app-header-actions></ion-buttons>
+  </ion-toolbar>
+</ion-header>
+<ion-content>
+  <ion-refresher slot="fixed" (ionRefresh)="load($event)"><ion-refresher-content></ion-refresher-content></ion-refresher>
+
+  <div class="welcome">
+    <div><span>Welcome back</span><h1>{{ firstName || 'Supplier' }}</h1></div>
+    <ion-button class="btn-gold" size="small" routerLink="/tabs/listings/create"><ion-icon slot="start" name="add-outline"></ion-icon>New listing</ion-button>
+  </div>
+
+  <div class="tile-grid kpis">
+    <a class="tile" routerLink="/tabs/listings"><div class="ico"><ion-icon name="cube-outline"></ion-icon></div><div class="val">{{ activeListings ?? '—' }}</div><div class="lbl">Active listings</div></a>
+    <a class="tile" [class.alert]="quotesWaiting" routerLink="/tabs/quotations"><div class="ico"><ion-icon name="document-text-outline"></ion-icon></div><div class="val">{{ quotesWaiting ?? '—' }}</div><div class="lbl">Quotes to price</div></a>
+    <a class="tile" [class.alert]="bookingsAction" routerLink="/tabs/bookings" [queryParams]="{ filter: 'active' }"><div class="ico"><ion-icon name="calendar-outline"></ion-icon></div><div class="val">{{ bookingsActive ?? '—' }}</div><div class="lbl">Active bookings</div></a>
+    <a class="tile" [class.alert]="payoutCount" routerLink="/tabs/payouts"><div class="ico"><ion-icon name="wallet-outline"></ion-icon></div><div class="val small">{{ payoutTotal === null ? '—' : (payoutTotal | zar:0) }}</div><div class="lbl">Ready to pay out</div></a>
+  </div>
+
+  @if (attention.length || eftCount) {
+    <div class="section-head"><h2>Needs your attention</h2><a routerLink="/tabs/bookings">All bookings</a></div>
+    <div class="att">
+      @if (eftCount) {
+        <a class="eq-card a" routerLink="/tabs/invoices" [queryParams]="{ filter: 'confirm' }">
+          <ion-icon name="flash-outline" class="bolt"></ion-icon>
+          <div class="grow"><strong>{{ eftCount }} EFT payment{{ eftCount === 1 ? '' : 's' }} to confirm</strong><span>Check the proof and your bank account</span></div>
+          <ion-icon name="chevron-forward-outline" class="muted"></ion-icon>
+        </a>
+      }
+      @for (x of attention; track x.b.bookingID) {
+        <a class="eq-card a" [routerLink]="['/tabs/bookings', x.b.bookingID]" [state]="{ booking: x.b }">
+          <ion-icon name="flash-outline" class="bolt"></ion-icon>
+          <div class="grow"><strong>{{ x.b.machinery }}</strong><span>{{ x.text }}</span></div>
+          <ion-icon name="chevron-forward-outline" class="muted"></ion-icon>
+        </a>
+      }
+    </div>
+  }
+
+  <div class="section-head"><h2>Quick links</h2></div>
+  <div class="tile-grid">
+    <a class="tile" routerLink="/tabs/inspections"><div class="ico"><ion-icon name="clipboard-outline"></ion-icon></div><div class="strong">Inspections</div></a>
+    <a class="tile" routerLink="/tabs/messages"><div class="ico"><ion-icon name="chatbubbles-outline"></ion-icon></div><div class="strong">Messages</div></a>
+  </div>
+  <div style="height:24px"></div>
+</ion-content>

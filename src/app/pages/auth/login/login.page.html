@@ -1,0 +1,42 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/home"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Sign in</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <div class="auth-wrap">
+    <div class="auth-header">
+      <h1>Welcome back</h1>
+      <p>Sign in to EquaMeridian Hub</p>
+    </div>
+
+    <ion-list lines="none" class="auth-form">
+      <ion-item>
+        <ion-input label="Email" labelPlacement="stacked" type="email" [(ngModel)]="email" autocomplete="email"></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-input label="Password" labelPlacement="stacked" type="password" [(ngModel)]="password" autocomplete="current-password"></ion-input>
+      </ion-item>
+      <ion-item lines="none">
+        <ion-checkbox [(ngModel)]="keepMeSignedIn" labelPlacement="end">Keep me signed in</ion-checkbox>
+      </ion-item>
+    </ion-list>
+
+    @if (error) {
+      <ion-text color="danger"><p class="error-msg">{{ error }}</p></ion-text>
+    }
+
+    <ion-button expand="block" (click)="onSubmit()" [disabled]="loading" class="submit-btn">
+      @if (loading) { <ion-spinner name="crescent"></ion-spinner> } @else { Sign in }
+    </ion-button>
+
+    <div class="auth-links">
+      <a routerLink="/auth/forgot-password">Forgot password?</a>
+      <a routerLink="/auth/register">Create an account</a>
+    </div>
+  </div>
+</ion-content>

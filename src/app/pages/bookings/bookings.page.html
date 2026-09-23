@@ -1,0 +1,57 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Bookings</ion-title>
+    <ion-buttons slot="end"><app-header-actions></app-header-actions></ion-buttons>
+  </ion-toolbar>
+  <ion-toolbar class="search-tb">
+    <ion-searchbar [(ngModel)]="search" (ionInput)="load()" debounce="450" placeholder="Search by machine or company"></ion-searchbar>
+  </ion-toolbar>
+  <div class="chip-scroll filters">
+    @for (f of filters; track f.key) {
+      <button type="button" class="chip" [class.on]="filter === f.key" (click)="filter = f.key">
+        {{ f.label }}@if (f.key === 'action' && count('action')) { <b class="dot">{{ count('action') }}</b> }
+      </button>
+    }
+  </div>
+</ion-header>
+
+<ion-content>
+  <ion-refresher slot="fixed" (ionRefresh)="load($event)"><ion-refresher-content></ion-refresher-content></ion-refresher>
+
+  @if (loading) {
+    <div class="page-pad">@for (i of [1,2,3]; track i) { <div class="sk" style="height:96px;margin-bottom:12px"></div> }</div>
+  } @else if (error) {
+    <app-empty-state icon="cloud-offline-outline" title="Couldn't load bookings" [message]="error" actionLabel="Try again" (action)="load()"></app-empty-state>
+  } @else {
+    @if (summary && items.length) {
+      <div class="stats">
+        <div><strong>{{ summary.activeBookings }}</strong><span>Active</span></div>
+        <div [class.hot]="summary.awaitingYourAction"><strong>{{ summary.awaitingYourAction }}</strong><span>Need action</span></div>
+        <div><strong>{{ summary.completedBookings }}</strong><span>Completed</span></div>
+      </div>
+    }
+
+    @if (!shown.length) {
+      <app-empty-state icon="calendar-outline"
+        [title]="items.length ? 'No bookings in this view' : 'No bookings yet'"
+        [message]="items.length ? 'Try another filter.' : (emptyMessage || (auth.role === 'supplier' ? 'Bookings appear here when contractors hire your equipment.' : 'Find a machine and book it to get started.'))"
+        [actionLabel]="!items.length && auth.role !== 'supplier' ? 'Browse machinery' : ''" actionLink="/tabs/browse"></app-empty-state>
+    } @else {
+      <div class="page-pad list">
+        @for (b of shown; track b.bookingID) {
+          <a class="eq-card bk" [routerLink]="['/tabs/bookings', b.bookingID]" [state]="{ booking: b }">
+            <div class="between top">
+              <strong>{{ b.machinery }}</strong>
+              <app-status-pill [status]="b.status"></app-status-pill>
+            </div>
+            <span class="who">{{ counterparty(b) }}</span>
+            <span class="when"><ion-icon name="calendar-outline"></ion-icon>{{ b.rentalStartDate | date:'d MMM' }} – {{ b.rentalEndDate | date:'d MMM yyyy' }}</span>
+            @if (next(b)) {
+              <div class="next" [class.wait]="!needsAction(b)"><ion-icon name="flash-outline"></ion-icon>{{ next(b) }}<ion-icon name="chevron-forward-outline" class="chev"></ion-icon></div>
+            }
+          </a>
+        }
+      </div>
+    }
+  }
+</ion-content>

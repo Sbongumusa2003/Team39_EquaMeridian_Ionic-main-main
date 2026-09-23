@@ -1,0 +1,14 @@
+.me { display:flex; align-items:center; gap:14px; margin:14px 16px 0; padding:16px; background:var(--eq-ink); border-radius:18px; color:#fff; }
+.av { width:54px; height:54px; border-radius:50%; background:var(--eq-gold); color:#111; display:flex; align-items:center; justify-content:center; font-size:1.4rem; font-weight:800; flex:0 0 54px; }
+.av.big { width:72px; height:72px; margin:0 auto 12px; font-size:1.5rem; background:var(--eq-ink); color:var(--eq-gold); }
+.me h2 { margin:0; font-size:1.1rem; font-weight:800; } .role { font-size:.78rem; color:var(--eq-gold); font-weight:700; }
+.grow { min-width:0; }
+.admin { display:flex; gap:10px; margin:12px 16px 0; padding:12px 14px; background:var(--eq-info-bg); color:var(--eq-info); border-radius:12px; font-size:.82rem; font-weight:600; }
+.admin p { margin:0; } .admin ion-icon { font-size:22px; flex:0 0 auto; }
+.menu { margin:0 16px; overflow:hidden; }
+.row { display:flex; align-items:center; gap:12px; padding:13px 14px; text-decoration:none; color:var(--eq-ink); border-bottom:1px solid var(--eq-line); }
+.row:last-child { border-bottom:0; }
+.ic { width:34px; height:34px; border-radius:10px; background:var(--eq-gold-soft); color:var(--eq-gold-dark); display:flex; align-items:center; justify-content:center; font-size:18px; }
+.lb { flex:1; font-weight:600; font-size:.93rem; } .chev { color:#b5b0a2; font-size:16px; }
+.guest { text-align:center; padding:32px 24px 20px; } .guest h2 { margin:0 0 6px; font-size:1.3rem; font-weight:800; }
+.guest p { margin:0 0 18px; color:var(--eq-muted); font-size:.9rem; }

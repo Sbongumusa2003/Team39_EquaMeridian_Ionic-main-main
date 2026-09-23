@@ -1,0 +1,59 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start"><ion-back-button defaultHref="/tabs/browse" text=""></ion-back-button></ion-buttons>
+    <ion-title>Compare machines</ion-title>
+  </ion-toolbar>
+</ion-header>
+<ion-content>
+  @if (loading) {
+    <div class="page-pad"><div class="sk" style="height:360px"></div></div>
+  } @else if (error) {
+    <div class="center"><p>{{ error }}</p><ion-button routerLink="/tabs/browse">Back to browse</ion-button></div>
+  } @else {
+    <div class="scroller">
+      <table>
+        <thead>
+          <tr>
+            <th class="lbl"></th>
+            @for (l of listings; track l.listingID) {
+              <th class="col">
+                @if (img(l)) { <img [src]="img(l)" alt="" /> } @else { <div class="ph"></div> }
+                <span class="t">{{ l.listingTitle }}</span>
+                <span class="p price">{{ l.dailyRateZAR | zar:0 }}<small>/day</small></span>
+                @if (lowestId === l.listingID) { <span class="pill ok">Lowest price</span> }
+              </th>
+            }
+          </tr>
+        </thead>
+        <tbody>
+          @for (s of specs; track s.key) {
+            @if (s.key !== 'dailyRateZAR') {
+              <tr>
+                <td class="lbl">{{ s.label }}</td>
+                @for (l of listings; track l.listingID) { <td>{{ s.key === 'pricingMode' ? (l.pricingMode === 'QuoteRequired' ? 'Quote only' : 'Fixed rate') : val(l, s.key) }}</td> }
+              </tr>
+            }
+          }
+          <tr>
+            <td class="lbl">Hire options</td>
+            @for (l of listings; track l.listingID) {
+              <td>{{ l.dryHireAvailable ? 'Dry' : '' }}{{ l.dryHireAvailable && l.wetHireAvailable ? ' + ' : '' }}{{ l.wetHireAvailable ? 'Wet' : '' }}</td>
+            }
+          </tr>
+          <tr>
+            <td class="lbl">Fulfilment</td>
+            @for (l of listings; track l.listingID) {
+              <td>{{ l.pickupAvailable ? 'Pickup' : '' }}{{ l.pickupAvailable && l.deliveryAvailable ? ' + ' : '' }}{{ l.deliveryAvailable ? 'Delivery' : '' }}</td>
+            }
+          </tr>
+          <tr class="act">
+            <td class="lbl"></td>
+            @for (l of listings; track l.listingID) {
+              <td><ion-button size="small" class="btn-gold" (click)="book(l)">{{ l.pricingMode === 'QuoteRequired' ? 'Request quote' : 'Book now' }}</ion-button></td>
+            }
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  }
+</ion-content>

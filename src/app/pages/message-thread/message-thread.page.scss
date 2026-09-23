@@ -1,0 +1,14 @@
+.msgs { display:flex; flex-direction:column; gap:8px; padding:14px 14px 18px; }
+.bubble { align-self:flex-start; max-width:80%; background:#fff; border:1px solid var(--eq-line); border-radius:16px 16px 16px 4px; padding:9px 12px; }
+.bubble.mine { align-self:flex-end; background:var(--eq-ink); color:#fff; border-color:var(--eq-ink); border-radius:16px 16px 4px 16px; }
+.text { font-size:.92rem; line-height:1.4; white-space:pre-wrap; word-break:break-word; }
+.time { margin-top:3px; font-size:.66rem; opacity:.6; text-align:right; }
+.att { display:block; margin-top:4px; font-size:.8rem; font-weight:700; color:inherit; }
+.first { text-align:center; padding:40px 24px; }
+.composer { display:flex; align-items:center; gap:8px; padding:8px 12px; }
+.in { flex:1; height:44px; border:1px solid var(--eq-line); border-radius:22px; padding:0 16px; font:inherit; font-size:.92rem; background:var(--eq-bg); outline:none; }
+.in:focus { border-color:var(--eq-gold); }
+.attach { width:40px; height:40px; display:flex; align-items:center; justify-content:center; font-size:22px; color:var(--eq-muted); cursor:pointer; }
+.snd { margin:0; --border-radius:22px; height:44px; width:48px; }
+.chipfile { margin:6px 12px 0; font-size:.76rem; background:var(--eq-mute-bg); border-radius:999px; padding:4px 10px; display:inline-flex; gap:8px; }
+.chipfile button { border:0; background:none; }

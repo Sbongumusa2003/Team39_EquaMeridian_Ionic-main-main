@@ -1,0 +1,32 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start"><ion-back-button defaultHref="/tabs/bookings" text=""></ion-back-button></ion-buttons>
+    <ion-title>Raise a dispute</ion-title>
+  </ion-toolbar>
+</ion-header>
+<ion-content>
+  <div class="form-pad">
+    <div class="eq-card pad intro"><strong>Booking #{{ bookingId }}</strong><p>Tell us what went wrong. An administrator reviews every dispute and both parties are kept informed.</p></div>
+
+    <div class="form-group">
+      <h3>What happened?</h3>
+      <ion-select class="field" label="Category" labelPlacement="floating" fill="outline" [(ngModel)]="disputeCategory" interface="popover">
+        @for (c of categories; track c) { <ion-select-option [value]="c">{{ c }}</ion-select-option> }
+      </ion-select>
+      <ion-textarea class="field" label="Describe the problem *" labelPlacement="floating" fill="outline" rows="5" [(ngModel)]="description"></ion-textarea>
+      <ion-textarea class="field" label="What outcome do you want? *" labelPlacement="floating" fill="outline" rows="3" [(ngModel)]="desiredResolution"></ion-textarea>
+    </div>
+
+    <div class="form-group">
+      <h3>Evidence</h3>
+      <label class="file-btn">
+        <input type="file" multiple accept=".pdf,.jpg,.jpeg,.png" (change)="onFiles($event)" hidden />
+        {{ files.length ? files.length + ' file(s) attached' : 'Attach photos or documents (optional)' }}
+      </label>
+    </div>
+
+    <ion-button expand="block" class="btn-gold big" (click)="submit()" [disabled]="submitting">
+      @if (submitting) { <ion-spinner name="crescent"></ion-spinner> } @else { Submit dispute }
+    </ion-button>
+  </div>
+</ion-content>

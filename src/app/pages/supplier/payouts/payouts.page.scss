@@ -1,0 +1,7 @@
+.filters { background:#fff; border-bottom:1px solid var(--eq-line); }
+.sum { display:grid; grid-template-columns:1fr 1fr; gap:10px; padding:14px 16px 4px; }
+.sum div { background:var(--eq-ink); color:#fff; border-radius:14px; padding:12px 14px; } .sum span { display:block; font-size:.72rem; color:rgba(255,255,255,.7); font-weight:600; }
+.sum strong { font-size:1.05rem; color:var(--eq-gold); }
+.page-pad { padding-top:12px; } .row { margin-bottom:12px; display:flex; flex-direction:column; gap:3px; } .row ion-button { margin:10px 0 0; }
+.t { font-size:.84rem; color:var(--eq-ink-2); } .kv.sm { padding:5px 0; font-size:.82rem; } .b { margin-top:6px; } .d { font-size:.76rem; color:var(--eq-muted); }
+.dec { margin:8px 0 0; font-size:.8rem; color:var(--eq-bad); font-weight:600; } .adm { margin:6px 0 0; font-size:.8rem; color:var(--eq-muted); }

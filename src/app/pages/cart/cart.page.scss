@@ -1,0 +1,29 @@
+.sup-head { display:flex; align-items:center; gap:7px; margin:14px 4px 8px; font-size:.78rem; font-weight:800; text-transform:uppercase; letter-spacing:.06em; color:var(--eq-muted); }
+.sup-head:first-child { margin-top:2px; }
+.line { display:flex; gap:12px; padding:10px; margin-bottom:10px; }
+.line.gone { border-color:#f3b8b2; background:#fff8f7; }
+.line img, .line .ph { width:84px; height:84px; border-radius:12px; object-fit:cover; background:#efece5; flex:0 0 84px; }
+.info { flex:1; min-width:0; display:flex; flex-direction:column; gap:3px; }
+.info strong { font-size:.92rem; line-height:1.25; }
+.when { display:flex; align-items:center; gap:4px; font-size:.76rem; color:var(--eq-muted); }
+.chips { display:flex; gap:6px; }
+.chips i { font-style:normal; font-size:.68rem; font-weight:700; background:var(--eq-mute-bg); color:#5b6068; border-radius:999px; padding:2px 8px; }
+.warn { display:flex; gap:4px; align-items:flex-start; font-size:.74rem; font-weight:700; color:var(--eq-bad); }
+.end { margin-top:4px; }
+.rm { width:34px; height:34px; border-radius:10px; border:1px solid var(--eq-line); background:#fff; color:var(--eq-bad); font-size:17px; display:flex; align-items:center; justify-content:center; cursor:pointer; }
+.promo { margin:14px 0 12px; }
+.promo-row { display:flex; gap:10px; align-items:flex-start; }
+.promo-row ion-input { flex:1; }
+.promo-row ion-button { margin:0; height:54px; }
+.fb { margin:8px 2px 0; font-size:.8rem; font-weight:700; color:var(--eq-bad); } .fb.ok { color:var(--eq-ok); }
+.green { color:var(--eq-ok) !important; }
+.fine { text-align:center; color:var(--eq-muted); font-size:.74rem; margin:10px 0 0; }
+.done { text-align:center; padding:18px 8px 20px; }
+.done ion-icon { font-size:60px; color:var(--eq-ok); }
+.done h2 { margin:6px 0 4px; font-size:1.3rem; font-weight:800; }
+.done p { margin:0; color:var(--eq-muted); font-size:.9rem; line-height:1.45; }
+.order { margin-bottom:12px; }
+.tiny { font-size:.76rem; }
+.steps { display:flex; gap:8px; margin:12px 0 6px; flex-wrap:wrap; }
+.steps ion-button { margin:0; }
+.link { display:inline-block; margin-top:4px; font-size:.82rem; font-weight:700; color:var(--eq-gold-dark); text-decoration:none; }

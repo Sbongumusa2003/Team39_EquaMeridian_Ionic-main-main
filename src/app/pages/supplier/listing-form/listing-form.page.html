@@ -1,0 +1,98 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start"><ion-back-button defaultHref="/tabs/listings" text=""></ion-back-button></ion-buttons>
+    <ion-title>{{ isEdit ? 'Edit listing' : 'New listing' }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  @if (loading) {
+    <div class="page-pad"><div class="sk" style="height:260px;margin-bottom:12px"></div><div class="sk" style="height:200px"></div></div>
+  } @else if (loadError) {
+    <app-empty-state icon="cloud-offline-outline" title="Couldn't load listing" [message]="loadError"></app-empty-state>
+  } @else {
+    <div class="form-pad">
+
+      <div class="form-group">
+        <h3>Photos</h3>
+        <div class="photos">
+          @for (img of images; track img.imageID) {
+            <div class="ph"><img [src]="imgUrl(img.url)" alt="" /><button type="button" (click)="removeExisting(img)" aria-label="Remove photo"><ion-icon name="close-circle"></ion-icon></button></div>
+          }
+          @for (p of previews; track $index) {
+            <div class="ph"><img [src]="p" alt="" /><button type="button" (click)="removeNew($index)" aria-label="Remove photo"><ion-icon name="close-circle"></ion-icon></button></div>
+          }
+          @if (images.length + newFiles.length < 8) {
+            <label class="ph add"><input type="file" accept="image/*" multiple hidden (change)="onFiles($event)" /><ion-icon name="camera-outline"></ion-icon><span>Add</span></label>
+          }
+        </div>
+        <p class="field-hint">Up to 8 photos. Good photos get far more bookings.</p>
+      </div>
+
+      <div class="form-group">
+        <h3>The machine</h3>
+        <ion-input class="field" label="Listing title *" labelPlacement="floating" fill="outline" maxlength="200" [(ngModel)]="listingTitle" placeholder="e.g. 20t Excavator"></ion-input>
+        <ion-select class="field" label="Category *" labelPlacement="floating" fill="outline" [(ngModel)]="categoryID" interface="popover">
+          @for (c of categories; track c.categoryID) { <ion-select-option [value]="c.categoryID">{{ c.name }}</ion-select-option> }
+        </ion-select>
+        <ion-textarea class="field" label="Description *" labelPlacement="floating" fill="outline" rows="4" maxlength="2000" [(ngModel)]="description"></ion-textarea>
+        <div class="row-2">
+          <ion-input class="field" label="Make / brand" labelPlacement="floating" fill="outline" maxlength="100" [(ngModel)]="makeBrand"></ion-input>
+          <ion-input class="field" label="Model" labelPlacement="floating" fill="outline" maxlength="100" [(ngModel)]="model"></ion-input>
+        </div>
+        <div class="row-2">
+          <ion-input class="field" label="Year" labelPlacement="floating" fill="outline" type="number" inputmode="numeric" min="1950" step="1" [(ngModel)]="year"></ion-input>
+          <ion-input class="field" label="Units you own *" labelPlacement="floating" fill="outline" type="number" inputmode="numeric" min="1" max="10000" step="1" [(ngModel)]="unitsOwned"></ion-input>
+        </div>
+        <div class="row-2">
+          <ion-input class="field" label="Operating weight" labelPlacement="floating" fill="outline" maxlength="50" [(ngModel)]="operatingWeight"></ion-input>
+          <ion-input class="field" label="Engine power" labelPlacement="floating" fill="outline" maxlength="50" [(ngModel)]="enginePower"></ion-input>
+        </div>
+        <ion-input class="field" label="Location" labelPlacement="floating" fill="outline" maxlength="200" [(ngModel)]="location" placeholder="Town / city"></ion-input>
+      </div>
+
+      <div class="form-group">
+        <h3>How is it priced?</h3>
+        <div class="opt-grid">
+          <button type="button" class="opt" [class.on]="pricingMode === 'Fixed'" (click)="pricingMode = 'Fixed'"><strong>Fixed rate</strong><small>Contractors book instantly</small></button>
+          <button type="button" class="opt" [class.on]="pricingMode === 'QuoteRequired'" (click)="pricingMode = 'QuoteRequired'"><strong>Quote only</strong><small>You price each request</small></button>
+        </div>
+        <div class="row-2 gap">
+          <ion-input class="field" label="Daily rate (R) *" labelPlacement="floating" fill="outline" type="number" inputmode="decimal" min="0.01" max="10000000" step="0.01" [(ngModel)]="dailyRate"></ion-input>
+          <ion-input class="field" label="Weekly rate (R)" labelPlacement="floating" fill="outline" type="number" inputmode="decimal" min="0.01" max="10000000" step="0.01" [(ngModel)]="weeklyRate"></ion-input>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <h3>Hire options</h3>
+        <div class="eq-card pad toggles">
+          <div class="tg"><span><strong>Dry hire</strong><small>Machine only</small></span><ion-toggle [(ngModel)]="dry"></ion-toggle></div>
+          <div class="tg"><span><strong>Wet hire</strong><small>With operator &amp; fuel</small></span><ion-toggle [(ngModel)]="wet"></ion-toggle></div>
+          @if (wet) {
+            <div class="row-2 sub">
+              <ion-input label="Wet daily (R) *" labelPlacement="floating" fill="outline" type="number" inputmode="decimal" min="0.01" max="10000000" step="0.01" [(ngModel)]="wetDaily"></ion-input>
+              <ion-input label="Wet weekly (R)" labelPlacement="floating" fill="outline" type="number" inputmode="decimal" min="0.01" max="10000000" step="0.01" [(ngModel)]="wetWeekly"></ion-input>
+            </div>
+          }
+          <div class="tg"><span><strong>Pickup</strong><small>Contractor collects</small></span><ion-toggle [(ngModel)]="pickup"></ion-toggle></div>
+          <div class="tg"><span><strong>Delivery</strong><small>You deliver</small></span><ion-toggle [(ngModel)]="delivery"></ion-toggle></div>
+          @if (delivery) { <ion-input class="sub1" label="Delivery fee (R)" labelPlacement="floating" fill="outline" type="number" inputmode="decimal" min="0" max="10000000" step="0.01" [(ngModel)]="deliveryFee"></ion-input> }
+        </div>
+      </div>
+
+      @if (!isEdit) {
+        <div class="eq-card pad agree"><ion-checkbox [(ngModel)]="agree" labelPlacement="end" justify="start">I accept the Master Lease Agreement for this machine</ion-checkbox></div>
+      }
+
+      @if (error) { <div class="form-error">{{ error }}</div> }
+    </div>
+  }
+</ion-content>
+
+@if (!loading && !loadError) {
+  <ion-footer class="cta-footer ion-no-border"><ion-toolbar>
+    <ion-button expand="block" class="btn-gold big" (click)="save()" [disabled]="saving">
+      @if (saving) { <ion-spinner name="crescent"></ion-spinner> } @else { {{ isEdit ? 'Save changes' : 'Submit listing' }} }
+    </ion-button>
+  </ion-toolbar></ion-footer>
+}

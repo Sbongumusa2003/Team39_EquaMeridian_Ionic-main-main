@@ -1,0 +1,26 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start"><ion-back-button defaultHref="/tabs/account" text=""></ion-back-button></ion-buttons>
+    <ion-title>Wishlist</ion-title>
+    <ion-buttons slot="end"><app-header-actions></app-header-actions></ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-refresher slot="fixed" (ionRefresh)="load($event)"><ion-refresher-content></ion-refresher-content></ion-refresher>
+  @if (loading) {
+    <div class="grid-2">@for (i of [1,2,3,4]; track i) { <div class="sk" style="height:250px;border-radius:16px"></div> }</div>
+  } @else if (error) {
+    <app-empty-state icon="cloud-offline-outline" title="Couldn't load wishlist" [message]="error" actionLabel="Try again" (action)="load()"></app-empty-state>
+  } @else if (!items.length) {
+    <app-empty-state icon="heart-outline" title="Nothing saved yet" message="Tap the heart on any machine to keep it here for later."
+      actionLabel="Browse machinery" actionLink="/tabs/browse"></app-empty-state>
+  } @else {
+    <p class="count">{{ items.length }} saved machine{{ items.length === 1 ? '' : 's' }}</p>
+    <div class="grid-2">
+      @for (w of items; track w.wishlistItemID) {
+        <app-product-card [listing]="w.listing" [wished]="true" (wishToggle)="remove($event)"></app-product-card>
+      }
+    </div>
+  }
+</ion-content>

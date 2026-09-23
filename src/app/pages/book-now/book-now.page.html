@@ -1,0 +1,86 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start"><ion-back-button defaultHref="/tabs/browse" text=""></ion-back-button></ion-buttons>
+    <ion-title>Book machine</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  @if (loading) {
+    <div class="page-pad"><div class="sk" style="height:84px;margin-bottom:14px"></div><div class="sk" style="height:300px"></div></div>
+  } @else if (!listing) {
+    <app-empty-state icon="cloud-offline-outline" title="Couldn't load this machine" [message]="error" actionLabel="Try again" (action)="load()"></app-empty-state>
+  } @else {
+    <div class="page-pad">
+      <div class="eq-card summary">
+        @if (img) { <img [src]="img" alt="" /> } @else { <div class="thumb-ph"></div> }
+        <div class="grow">
+          <strong>{{ listing.listingTitle }}</strong>
+          <span>{{ listing.supplierName }}</span>
+          <span class="price">{{ listing.dailyRateZAR | zar:0 }}<small>/day</small></span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <h3>Hire period</h3>
+        <div class="row-2">
+          <ion-input type="date" label="Start date" labelPlacement="floating" fill="outline" [(ngModel)]="startDate" [min]="minDate" (ionInput)="onStartChange()"></ion-input>
+          <ion-input type="date" label="End date" labelPlacement="floating" fill="outline" [(ngModel)]="endDate" [min]="startDate || minDate"></ion-input>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <h3>Quantity</h3>
+        <div class="between">
+          <div class="stepper">
+            <button type="button" (click)="setQty(quantity - 1)" [disabled]="quantity <= 1" aria-label="Fewer">−</button>
+            <span>{{ quantity }}</span>
+            <button type="button" (click)="setQty(quantity + 1)" [disabled]="quantity >= maxQty" aria-label="More">+</button>
+          </div>
+          <span class="muted small">{{ listing.unitsAvailable }} available</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <h3>How do you want it?</h3>
+        <div class="opt-grid">
+          <button type="button" class="opt" [class.on]="fulfillmentMethod === 'Contractor Pickup'" [disabled]="!listing.pickupAvailable" (click)="fulfillmentMethod = 'Contractor Pickup'">
+            <ion-icon name="cube-outline"></ion-icon>
+            <strong>Pickup</strong><small>Collect from the supplier</small>
+          </button>
+          <button type="button" class="opt" [class.on]="fulfillmentMethod === 'Supplier Delivery'" [disabled]="!listing.deliveryAvailable" (click)="fulfillmentMethod = 'Supplier Delivery'">
+            <ion-icon name="car-outline"></ion-icon>
+            <strong>Delivery</strong>
+            <small>{{ listing.deliveryAvailable ? (listing.deliveryFeeZAR ? 'From ' + (listing.deliveryFeeZAR | zar:0) : 'Supplier delivers') : 'Not offered' }}</small>
+          </button>
+        </div>
+        @if (fulfillmentMethod === 'Supplier Delivery') {
+          <ion-textarea class="addr" label="Delivery address" labelPlacement="floating" fill="outline" rows="3" [(ngModel)]="deliveryAddress"
+            placeholder="Street, suburb, city"></ion-textarea>
+        }
+      </div>
+
+      @if (days) {
+        <div class="eq-card pad est">
+          <div class="kv"><span>{{ days }} day{{ days === 1 ? '' : 's' }} × {{ quantity }} × {{ listing.dailyRateZAR | zar:0 }}</span><span>{{ estimate | zar:0 }}</span></div>
+          <p class="field-hint">Estimate excl. VAT. Discounts, delivery and VAT are calculated in your cart.</p>
+        </div>
+      }
+
+      @if (error) { <div class="form-error">{{ error }}</div> }
+    </div>
+  }
+</ion-content>
+
+@if (listing) {
+  <ion-footer class="cta-footer ion-no-border">
+    <ion-toolbar>
+      <div class="cta-bar">
+        <div class="cta-price"><small>Estimate</small><strong>{{ days ? (estimate | zar:0) : '—' }}</strong></div>
+        <ion-button class="btn-gold big" (click)="submit()" [disabled]="submitting">
+          @if (submitting) { <ion-spinner name="crescent"></ion-spinner> } @else { Add to cart }
+        </ion-button>
+      </div>
+    </ion-toolbar>
+  </ion-footer>
+}

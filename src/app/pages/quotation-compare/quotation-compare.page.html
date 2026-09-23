@@ -1,0 +1,38 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start"><ion-back-button defaultHref="/tabs/quotations"></ion-back-button></ion-buttons>
+    <ion-title>Compare quotes</ion-title>
+  </ion-toolbar>
+</ion-header>
+<ion-content class="ion-padding">
+  @if (loading) { <div class="center"><ion-spinner></ion-spinner></div> }
+  @else if (error) { <div class="center"><p>{{ error }}</p></div> }
+  @else {
+    @if (warning) { <p class="warn">{{ warning }}</p> }
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Field</th>
+            @for (q of items; track q.quotationID) {
+              <th>#{{ q.quotationID }}</th>
+            }
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td class="spec">Supplier</td>@for (q of items; track q.quotationID){<td>{{ q.supplierName }}</td>}</tr>
+          <tr><td class="spec">Daily rate</td>@for (q of items; track q.quotationID){<td>R {{ q.dailyRateZAR }}</td>}</tr>
+          <tr><td class="spec">Delivery fee</td>@for (q of items; track q.quotationID){<td>R {{ q.deliveryFee }}</td>}</tr>
+          <tr><td class="spec">Valid until</td>@for (q of items; track q.quotationID){<td>{{ q.quoteValidUntil | date:'mediumDate' }}</td>}</tr>
+          <tr><td class="spec">Status</td>@for (q of items; track q.quotationID){<td><ion-badge>{{ q.status }}</ion-badge></td>}</tr>
+          <tr>
+            <td class="spec">Open</td>
+            @for (q of items; track q.quotationID) {
+              <td><ion-button size="small" [routerLink]="['/tabs/quotations', q.quotationID]">View</ion-button></td>
+            }
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  }
+</ion-content>

@@ -1,0 +1,72 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start"><ion-back-button defaultHref="/tabs/lease-agreements" text=""></ion-back-button></ion-buttons>
+    <ion-title>Lease agreement</ion-title>
+  </ion-toolbar>
+</ion-header>
+<ion-content>
+  @if (loading) {
+    <div class="page-pad"><div class="sk" style="height:140px;margin-bottom:12px"></div><div class="sk" style="height:220px"></div></div>
+  } @else if (!a) {
+    <app-empty-state icon="cloud-offline-outline" title="Agreement unavailable" [message]="error" actionLabel="Try again" (action)="load()"></app-empty-state>
+  } @else {
+    <div class="page-pad stack">
+      <div class="eq-card pad">
+        <div class="between top"><h1>{{ a.listingTitle }}</h1><app-status-pill [status]="a.status"></app-status-pill></div>
+        <span class="no">{{ a.agreementNumber }}</span>
+        @if (a.make || a.model || a.year) { <p class="spec">{{ a.make }} {{ a.model }} {{ a.year }}</p> }
+      </div>
+
+      <div class="eq-card pad">
+        <h3 class="ch">Hire summary</h3>
+        <div class="kv"><span>Period</span><span>{{ a.rentalStartDate | date:'d MMM' }} – {{ a.rentalEndDate | date:'d MMM yyyy' }}</span></div>
+        <div class="kv"><span>Quantity</span><span>{{ a.quantity }}</span></div>
+        @if (a.location) { <div class="kv"><span>Location</span><span>{{ a.location }}</span></div> }
+        <div class="kv"><span>Supplier</span><span>{{ a.supplierName }}</span></div>
+        <div class="kv"><span>Contractor</span><span>{{ a.contractorName }}</span></div>
+        <div class="kv"><span>Payment due</span><span>{{ a.paymentDueDate | date:'d MMM yyyy' }}</span></div>
+        @if (a.paymentMethod) { <div class="kv"><span>Payment method</span><span>{{ a.paymentMethod }}</span></div> }
+        @if (a.depositAmount) { <div class="kv"><span>Deposit</span><span>{{ a.depositAmount | zar }}</span></div> }
+        <div class="kv total"><span>Total</span><span>{{ a.totalAmount | zar }}</span></div>
+      </div>
+
+      <div class="eq-card pad">
+        <h3 class="ch">Signatures</h3>
+        <div class="sig" [class.on]="a.supplierSigned">
+          <ion-icon [name]="a.supplierSigned ? 'checkmark-circle' : 'ellipse-outline'"></ion-icon>
+          <div><strong>Supplier</strong><span>{{ a.supplierSigned ? (a.supplierSignatureName + ' · ' + (a.supplierSignedDate | date:'d MMM yyyy')) : 'Not signed yet' }}</span></div>
+        </div>
+        <div class="sig" [class.on]="a.contractorSigned">
+          <ion-icon [name]="a.contractorSigned ? 'checkmark-circle' : 'ellipse-outline'"></ion-icon>
+          <div><strong>Contractor</strong><span>{{ a.contractorSigned ? (a.contractorSignatureName + ' · ' + (a.contractorSignedDate | date:'d MMM yyyy')) : 'Not signed yet' }}</span></div>
+        </div>
+      </div>
+
+      <div class="eq-card terms">
+        <h3 class="ch pad-h">Terms &amp; conditions</h3>
+        @for (t of terms; track t.title) {
+          <details>
+            <summary>{{ t.title }}<ion-icon name="chevron-down-outline"></ion-icon></summary>
+            <p>{{ t.body }}</p>
+          </details>
+        }
+      </div>
+
+      @if (a.canSign) {
+        <div class="eq-card pad sign">
+          <h3 class="ch">Sign this agreement</h3>
+          <ion-checkbox [(ngModel)]="agree" labelPlacement="end" justify="start">I have read the terms above</ion-checkbox>
+          <ion-checkbox [(ngModel)]="agreeBinding" labelPlacement="end" justify="start">I understand this is legally binding</ion-checkbox>
+          <ion-input label="Full name (your signature)" labelPlacement="floating" fill="outline" [(ngModel)]="fullName" class="nm"></ion-input>
+          <ion-button expand="block" class="btn-gold big" (click)="sign()" [disabled]="signing || !agree || !agreeBinding || fullName.trim().length < 2">
+            @if (signing) { <ion-spinner name="crescent"></ion-spinner> } @else { Sign agreement }
+          </ion-button>
+        </div>
+      }
+
+      @if (auth.role === 'contractor' && a.contractorSigned) {
+        <ion-button expand="block" class="btn-gold" (click)="continueToPayment()">{{ justSigned ? 'Signed — continue to payment' : 'Continue to payment' }}</ion-button>
+      }
+    </div>
+  }
+</ion-content>

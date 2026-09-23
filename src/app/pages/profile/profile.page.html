@@ -1,0 +1,40 @@
+<ion-header><ion-toolbar>
+  <ion-buttons slot="start"><ion-back-button defaultHref="/tabs/account" text=""></ion-back-button></ion-buttons>
+  <ion-title>Profile &amp; security</ion-title>
+</ion-toolbar></ion-header>
+<ion-content>
+  @if (loading) {
+    <div class="page-pad"><div class="sk" style="height:300px"></div></div>
+  } @else if (p) {
+    <div class="page-pad stack">
+      <div class="eq-card pad">
+        <div class="between"><strong>{{ p.email }}</strong><app-status-pill [status]="p.accountStatus"></app-status-pill></div>
+        <span class="since">Member since {{ p.createdDate | date:'MMM yyyy' }}</span>
+      </div>
+
+      <div class="form-group">
+        <h3>Your details</h3>
+        <ion-input class="field" label="Full name" labelPlacement="floating" fill="outline" maxlength="200" [(ngModel)]="fullName"></ion-input>
+        <ion-input class="field" label="Company" labelPlacement="floating" fill="outline" maxlength="200" [(ngModel)]="companyName"></ion-input>
+        @if (auth.role === 'supplier') { <ion-input class="field" label="Registration number" labelPlacement="floating" fill="outline" maxlength="100" [(ngModel)]="registrationNumber"></ion-input> }
+        @if (p.serviceAreaNames.length) { <p class="field-hint">Service areas: {{ p.serviceAreaNames.join(', ') }}</p> }
+        <ion-button expand="block" class="btn-gold" (click)="save()" [disabled]="saving">{{ saving ? 'Saving…' : 'Save changes' }}</ion-button>
+      </div>
+
+      <div class="form-group">
+        <h3>Two-factor authentication</h3>
+        <div class="eq-card pad">
+          <div class="between"><span>Status</span><app-status-pill [status]="p.twoFactorEnabled ? 'Enabled' : 'Disabled'" [force]="p.twoFactorEnabled ? 'ok' : 'mute'"></app-status-pill></div>
+          <ion-input class="field pw" type="password" label="Password" labelPlacement="floating" fill="outline" [(ngModel)]="passwordFor2fa"></ion-input>
+          <ion-button expand="block" fill="outline" (click)="toggle2fa()" [disabled]="toggling2fa">{{ p.twoFactorEnabled ? 'Turn off 2FA' : 'Turn on 2FA' }}</ion-button>
+        </div>
+      </div>
+
+      <div class="danger eq-card pad">
+        <h3>Deactivate account</h3>
+        <p>Signs you out and prevents future sign-ins. This can't be undone from the app.</p>
+        <ion-button expand="block" fill="outline" color="danger" (click)="deactivate()" [disabled]="deactivating">Deactivate my account</ion-button>
+      </div>
+    </div>
+  }
+</ion-content>

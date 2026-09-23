@@ -1,0 +1,12 @@
+.filters { background:#fff; border-bottom:1px solid var(--eq-line); } .chip em { font-style:normal; opacity:.6; margin-left:2px; }
+.ls { padding:12px; margin-bottom:12px; }
+.top { display:flex; gap:12px; }
+.top img, .ph { width:92px; height:92px; border-radius:12px; object-fit:cover; background:#efece5; flex:0 0 92px; }
+.ph { display:flex; align-items:center; justify-content:center; font-size:32px; color:#b9b2a2; }
+.info { display:flex; flex-direction:column; gap:4px; align-items:flex-start; min-width:0; }
+.info strong { font-size:.96rem; line-height:1.25; } .meta { font-size:.76rem; color:var(--eq-muted); }
+.acts { display:flex; gap:8px; margin-top:12px; padding-top:10px; border-top:1px solid var(--eq-line); }
+.acts a, .acts button { flex:1; display:flex; align-items:center; justify-content:center; gap:5px; padding:9px 4px; border:1px solid var(--eq-line); border-radius:10px; background:#fff; color:var(--eq-ink); font:inherit; font-size:.78rem; font-weight:700; text-decoration:none; cursor:pointer; }
+.acts .del { color:var(--eq-bad); }
+.adm { margin:8px 0 0; font-size:.8rem; font-weight:600; color:var(--eq-bad); } .c { text-align:center; padding:24px; }
+ion-fab { margin-bottom:8px; }

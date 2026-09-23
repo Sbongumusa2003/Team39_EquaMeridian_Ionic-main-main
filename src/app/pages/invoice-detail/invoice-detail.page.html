@@ -1,0 +1,113 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start"><ion-back-button defaultHref="/tabs/invoices" text=""></ion-back-button></ion-buttons>
+    <ion-title>Invoice</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-refresher slot="fixed" (ionRefresh)="reload($event)"><ion-refresher-content></ion-refresher-content></ion-refresher>
+  @if (loading) {
+    <div class="page-pad"><div class="sk" style="height:150px;margin-bottom:12px"></div><div class="sk" style="height:220px"></div></div>
+  } @else if (!inv) {
+    <app-empty-state icon="cloud-offline-outline" title="Invoice unavailable" [message]="error" actionLabel="Try again" (action)="reload()"></app-empty-state>
+  } @else {
+    <div class="page-pad stack">
+      <div class="eq-card pad hero">
+        <div class="between"><span class="no">{{ inv.invoiceNumber }}</span><app-status-pill [status]="status"></app-status-pill></div>
+        <div class="amt">{{ inv.totalAmount | zar }}</div>
+        <div class="sub">{{ inv.listingTitle }}</div>
+      </div>
+
+      @if (canPay && !eftInfo) {
+        <ion-button expand="block" class="btn-gold big" (click)="pay()" [disabled]="paying">
+          @if (paying) { <ion-spinner name="crescent"></ion-spinner> } @else { Pay {{ inv.totalAmount | zar }} now }
+        </ion-button>
+      }
+
+      <!-- EFT instructions (large invoices exceed the card limit) -->
+      @if (eftInfo) {
+        <div class="eq-card pad eft">
+          <h3>Pay by EFT</h3>
+          <p class="muted">{{ eftInfo.message || 'This amount is above the card limit. Transfer it using the bank details below, then upload your proof of payment.' }}</p>
+          @if (eftInfo.bank) {
+            <div class="kv"><span>Bank</span><span>{{ eftInfo.bank.bankName || '—' }}</span></div>
+            <div class="kv"><span>Account name</span><span>{{ eftInfo.bank.accountName || '—' }}</span></div>
+            <div class="kv"><span>Account no.</span><span class="copy" (click)="copy(eftInfo.bank.accountNumber)">{{ eftInfo.bank.accountNumber || '—' }} <ion-icon name="copy-outline"></ion-icon></span></div>
+            <div class="kv"><span>Branch code</span><span>{{ eftInfo.bank.branchCode || '—' }}</span></div>
+            <div class="kv"><span>Reference</span><span class="copy" (click)="copy(eftInfo.reference || inv.invoiceNumber)">{{ eftInfo.reference || inv.invoiceNumber }} <ion-icon name="copy-outline"></ion-icon></span></div>
+          } @else if (eftInfo.bankConfigured === false) {
+            <div class="form-error">Bank details aren't configured yet. Please contact support.</div>
+          }
+          <label class="upload">
+            <input type="file" accept="image/*,.pdf" hidden (change)="onProof($event)" [disabled]="uploading" />
+            <ion-icon name="cloud-upload-outline"></ion-icon>{{ uploading ? 'Uploading…' : 'Upload proof of payment' }}
+          </label>
+        </div>
+      }
+
+      @if (eftSubmitted && isContractor) {
+        <div class="eq-card pad waiting">
+          <ion-icon name="time-outline"></ion-icon>
+          <div>
+            <strong>Proof submitted</strong>
+            <p>Waiting for {{ inv.supplierName }} to confirm the funds. We'll notify you as soon as they do.</p>
+            <label class="replace"><input type="file" accept="image/*,.pdf" hidden (change)="onProof($event)" [disabled]="uploading" />{{ uploading ? 'Uploading…' : 'Uploaded the wrong file? Replace it' }}</label>
+          </div>
+        </div>
+      }
+
+      @if (canConfirmEft) {
+        <div class="eq-card pad confirm">
+          <h3 class="ch">Confirm the EFT payment</h3>
+          <p class="muted">{{ inv.contractorName }} says they have paid. Please verify before you confirm:</p>
+          <ol class="chk">
+            <li>Open the proof of payment below.</li>
+            <li>Check that <strong>{{ inv.totalAmount | zar }}</strong> has reached your bank account (reference <strong>{{ inv.invoiceNumber }}</strong>).</li>
+            <li>Confirm receipt. The booking moves to <em>Confirmed</em> and the contractor is notified.</li>
+          </ol>
+          <div class="btns">
+            <ion-button fill="outline" (click)="viewProof()"><ion-icon slot="start" name="image-outline"></ion-icon>View proof</ion-button>
+            <ion-button class="btn-gold" (click)="confirmEft()" [disabled]="confirming">{{ confirming ? 'Confirming…' : 'Confirm received' }}</ion-button>
+          </div>
+        </div>
+      }
+
+      <div class="eq-card pad">
+        <h3 class="ch">Price breakdown</h3>
+        <div class="kv">
+          <span>Hire @if (hireCalc) { <em class="calc">{{ hireCalc }}</em> }</span>
+          <span>{{ inv.subtotal | zar }}</span>
+        </div>
+        @if (discount > 0) { <div class="kv"><span>Discount</span><span class="green">− {{ discount | zar }}</span></div> }
+        @if (delivery > 0) { <div class="kv"><span>Delivery / transport</span><span>{{ delivery | zar }}</span></div> }
+        @if (otherAdjustments !== 0) { <div class="kv"><span>Other adjustments</span><span>{{ otherAdjustments | zar }}</span></div> }
+        <div class="kv sub"><span>Subtotal excl. VAT</span><span>{{ exclVat | zar }}</span></div>
+        <div class="kv"><span>VAT ({{ inv.vatRate }}%)</span><span>{{ inv.vatAmount | zar }}</span></div>
+        <div class="kv total"><span>Total incl. VAT</span><span>{{ inv.totalAmount | zar }}</span></div>
+      </div>
+
+      @if (isSupplier) {
+        <div class="eq-card pad">
+          <h3 class="ch">Your payout</h3>
+          <div class="kv"><span>Platform fee ({{ inv.platformFeePercentage }}%)</span><span>− {{ inv.platformFeeAmount | zar }}</span></div>
+          <div class="kv total"><span>You receive</span><span>{{ inv.supplierPayableAmount | zar }}</span></div>
+        </div>
+      }
+
+      <div class="eq-card pad">
+        <h3 class="ch">Details</h3>
+        <div class="kv"><span>Invoice date</span><span>{{ inv.invoiceDate | date:'d MMM yyyy' }}</span></div>
+        <div class="kv"><span>Due date</span><span>{{ inv.dueDate | date:'d MMM yyyy' }}</span></div>
+        @if (inv.rentalStartDate && inv.rentalEndDate) { <div class="kv"><span>Hire period</span><span>{{ inv.rentalStartDate | date:'d MMM' }} – {{ inv.rentalEndDate | date:'d MMM yyyy' }}</span></div> }
+        @if (inv.paymentMethod) { <div class="kv"><span>Payment method</span><span>{{ inv.paymentMethod }}</span></div> }
+        <div class="kv"><span>{{ isSupplier ? 'Contractor' : 'Supplier' }}</span><span>{{ isSupplier ? inv.contractorName : inv.supplierName }}</span></div>
+      </div>
+
+      <div class="btns col">
+        <ion-button fill="outline" expand="block" (click)="download()"><ion-icon slot="start" name="download-outline"></ion-icon>Download PDF</ion-button>
+        @if (isContractor && (eftSubmitted || isPaid)) { <ion-button fill="clear" expand="block" (click)="viewProof()">View proof of payment</ion-button> }
+      </div>
+    </div>
+  }
+</ion-content>

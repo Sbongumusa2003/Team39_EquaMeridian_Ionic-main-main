@@ -1,0 +1,9 @@
+<ion-header><ion-toolbar>
+  <ion-buttons slot="start"><ion-back-button defaultHref="/tabs/account" text=""></ion-back-button></ion-buttons>
+  <ion-title>{{ title }}</ion-title>
+</ion-toolbar>
+<div class="chip-scroll tabs">@for (t of tabs; track t.key) { <a class="chip" [class.on]="key === t.key" [routerLink]="['/tabs/policies', t.key]" replaceUrl="true">{{ t.label }}</a> }</div>
+</ion-header>
+<ion-content>
+  <div class="page-pad"><div class="eq-card pad"><h1>{{ title }}</h1><p>{{ body }}</p><p class="note">Full legal text is maintained on the corporate site and within the web application.</p></div></div>
+</ion-content>

@@ -1,0 +1,44 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>My listings</ion-title>
+    <ion-buttons slot="end"><app-header-actions></app-header-actions></ion-buttons>
+  </ion-toolbar>
+  <div class="chip-scroll filters">
+    @for (f of filters; track f) { @if (f === 'All' || count(f)) { <button type="button" class="chip" [class.on]="filter === f" (click)="filter = f">{{ f }} <em>{{ count(f) }}</em></button> } }
+  </div>
+</ion-header>
+<ion-content>
+  <ion-refresher slot="fixed" (ionRefresh)="load($event)"><ion-refresher-content></ion-refresher-content></ion-refresher>
+  @if (loading) {
+    <div class="page-pad">@for (i of [1,2,3]; track i) { <div class="sk" style="height:112px;margin-bottom:12px"></div> }</div>
+  } @else if (error) {
+    <app-empty-state icon="cloud-offline-outline" title="Couldn't load listings" [message]="error" actionLabel="Try again" (action)="load()"></app-empty-state>
+  } @else if (!rows.length) {
+    <app-empty-state icon="cube-outline" title="No listings yet" message="List your first machine and start receiving bookings." actionLabel="Create listing" actionLink="/tabs/listings/create"></app-empty-state>
+  } @else {
+    <div class="page-pad">
+      @for (r of shown; track r.listing.listingID) {
+        <div class="eq-card ls">
+          <div class="top">
+            @if (img(r.listing)) { <img [src]="img(r.listing)" alt="" /> } @else { <div class="ph"><ion-icon name="cube-outline"></ion-icon></div> }
+            <div class="info">
+              <div class="between"><strong>{{ r.listing.listingTitle }}</strong></div>
+              <app-status-pill [status]="r.listing.availabilityStatus"></app-status-pill>
+              <span class="price">{{ r.listing.dailyRateZAR | zar:0 }}<small>/day</small></span>
+              <span class="meta">{{ r.listing.pricingMode === 'QuoteRequired' ? 'Quote only' : r.listing.unitsAvailable + ' of ' + r.listing.unitsOwned + ' available' }}</span>
+            </div>
+          </div>
+          @if (r.actions.contactAdmin) { <p class="adm">Suspended — contact an administrator.</p> }
+          @if (r.actions.canEdit || r.actions.canDeactivate || r.actions.canDelete) {
+            <div class="acts">
+              @if (r.actions.canEdit) { <a [routerLink]="['/tabs/listings', r.listing.listingID, 'edit']"><ion-icon name="create-outline"></ion-icon>Edit</a> }
+              @if (r.actions.canDeactivate) { <button type="button" (click)="deactivate(r)"><ion-icon name="pause-circle-outline"></ion-icon>Deactivate</button> }
+              @if (r.actions.canDelete) { <button type="button" class="del" (click)="remove(r)"><ion-icon name="trash-outline"></ion-icon>Delete</button> }
+            </div>
+          }
+        </div>
+      } @empty { <p class="muted c">No listings with this status.</p> }
+    </div>
+  }
+  <ion-fab slot="fixed" vertical="bottom" horizontal="end"><ion-fab-button routerLink="/tabs/listings/create" aria-label="New listing"><ion-icon name="add-outline"></ion-icon></ion-fab-button></ion-fab>
+</ion-content>

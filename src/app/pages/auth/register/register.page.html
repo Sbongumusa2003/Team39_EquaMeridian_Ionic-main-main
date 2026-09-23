@@ -1,0 +1,173 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/home"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Create account</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <div class="auth-wrap">
+    <div class="auth-header">
+      <h1>Join EquaMeridian</h1>
+      <p>Create your contractor or supplier account</p>
+    </div>
+
+    <ion-list lines="none" class="auth-form">
+      <ion-item>
+        <ion-select
+          label="I am a..."
+          labelPlacement="stacked"
+          [(ngModel)]="role"
+          (ionChange)="onRoleChange()"
+          interface="action-sheet"
+        >
+          <ion-select-option value="contractor">Contractor</ion-select-option>
+          <ion-select-option value="supplier">Supplier</ion-select-option>
+        </ion-select>
+      </ion-item>
+
+      <ion-item>
+        <ion-input label="Full name *" labelPlacement="stacked" maxlength="200" [(ngModel)]="fullName" placeholder="Jane Doe"></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-input label="Email *" labelPlacement="stacked" type="email" [(ngModel)]="email" placeholder="you@company.com"></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-input label="Company name *" labelPlacement="stacked" maxlength="200" [(ngModel)]="companyName" placeholder="Your company"></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-input label="Phone" labelPlacement="stacked" type="tel" inputmode="tel" maxlength="16" [(ngModel)]="phoneNumber" placeholder="+27 ..."></ion-input>
+      </ion-item>
+
+      @if (role === 'supplier') {
+        <ion-item>
+          <ion-input
+            label="Company registration number"
+            labelPlacement="stacked"
+            [(ngModel)]="registrationNumber"
+            placeholder="e.g. 2020/123456/07"
+          ></ion-input>
+        </ion-item>
+      }
+
+      <ion-item>
+        <ion-input
+          label="Password *"
+          labelPlacement="stacked"
+          type="password"
+          [(ngModel)]="password"
+          placeholder="Min 8 characters"
+        ></ion-input>
+      </ion-item>
+      <ion-note class="hint">Use uppercase, a number and a symbol.</ion-note>
+
+      <ion-item>
+        <ion-input
+          label="Confirm password *"
+          labelPlacement="stacked"
+          type="password"
+          [(ngModel)]="confirmPassword"
+          placeholder="Repeat password"
+        ></ion-input>
+      </ion-item>
+    </ion-list>
+
+    <!-- Supplier verification documents -->
+    @if (role === 'supplier') {
+      <div class="docs-section">
+        <h2>Verification documents *</h2>
+        <p class="docs-hint">
+          Accepted: PDF, JPG, PNG (max 10MB each). An admin reviews these before your account is activated.
+        </p>
+
+        @if (loadingTypes) {
+          <div class="center-row"><ion-spinner name="crescent"></ion-spinner></div>
+        }
+
+        @if (requiredTypes.length) {
+          <p class="required-list">
+            Required:
+            @for (t of requiredTypes; track t.docTypeID) {
+              <span class="req-chip" [class.covered]="isTypeCovered(t.docTypeID)">{{ t.typeName }}</span>
+            }
+          </p>
+        }
+
+        @for (row of docRows; track $index; let i = $index) {
+          <div class="doc-row" [class.has-error]="row.error">
+            <ion-item lines="none">
+              <ion-select
+                label="Document type"
+                labelPlacement="stacked"
+                [(ngModel)]="row.docTypeId"
+                interface="popover"
+                [disabled]="loading"
+              >
+                @for (t of availableTypesFor(i); track t.docTypeID) {
+                  <ion-select-option [value]="t.docTypeID">
+                    {{ t.typeName }}{{ t.isRequired ? ' (required)' : '' }}
+                  </ion-select-option>
+                }
+              </ion-select>
+            </ion-item>
+
+            <div class="file-row">
+              <label class="file-btn">
+                <input type="file" accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png"
+                       (change)="onFilePicked($event, i)" [disabled]="loading" hidden />
+                {{ row.file ? row.file.name : 'Choose file' }}
+              </label>
+              @if (docRows.length > 1) {
+                <ion-button fill="clear" color="medium" size="small" (click)="removeDocRow(i)" [disabled]="loading">
+                  Remove
+                </ion-button>
+              }
+            </div>
+            @if (row.error) {
+              <p class="row-error">{{ row.error }}</p>
+            }
+          </div>
+        }
+
+        <ion-button fill="outline" size="small" (click)="addDocRow()" [disabled]="loading" class="add-doc-btn">
+          + Add another document
+        </ion-button>
+
+        @if (documentsError) {
+          <ion-text color="danger"><p class="error-msg">{{ documentsError }}</p></ion-text>
+        }
+      </div>
+    }
+
+    <ion-item lines="none" class="terms-item">
+      <ion-checkbox [(ngModel)]="agreeToTerms" labelPlacement="end">
+        I agree to the Terms of Service and Privacy Policy *
+      </ion-checkbox>
+    </ion-item>
+
+    @if (error) {
+      <ion-text color="danger"><p class="error-msg">{{ error }}</p></ion-text>
+    }
+
+    @if (progress !== null) {
+      <ion-progress-bar [value]="progress / 100"></ion-progress-bar>
+      <p class="progress-label">Uploading… {{ progress }}%</p>
+    }
+
+    <ion-button expand="block" (click)="onSubmit()" [disabled]="loading" class="submit-btn">
+      @if (loading) {
+        <ion-spinner name="crescent"></ion-spinner>
+      } @else if (role === 'supplier') {
+        Submit supplier application
+      } @else {
+        Create account
+      }
+    </ion-button>
+
+    <div class="auth-links">
+      <a routerLink="/auth/login">Already have an account? Sign in</a>
+    </div>
+  </div>
+</ion-content>

@@ -1,0 +1,31 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start"><ion-back-button defaultHref="/tabs/account" text=""></ion-back-button></ion-buttons>
+    <ion-title>Notifications</ion-title>
+    @if (unread) { <ion-buttons slot="end"><ion-button (click)="markAll()">Mark all read</ion-button></ion-buttons> }
+  </ion-toolbar>
+</ion-header>
+<ion-content>
+  <ion-refresher slot="fixed" (ionRefresh)="load($event)"><ion-refresher-content></ion-refresher-content></ion-refresher>
+  @if (loading) {
+    <div class="page-pad">@for (i of [1,2,3,4]; track i) { <div class="sk" style="height:76px;margin-bottom:10px"></div> }</div>
+  } @else if (error) {
+    <app-empty-state icon="cloud-offline-outline" title="Couldn't load notifications" [message]="error" actionLabel="Try again" (action)="load()"></app-empty-state>
+  } @else if (!items.length) {
+    <app-empty-state icon="notifications-outline" title="You're all caught up" message="Updates about your bookings, payments and quotes will appear here."></app-empty-state>
+  } @else {
+    <div class="page-pad">
+      @for (n of items; track n.notificationID) {
+        <button type="button" class="eq-card nt" [class.unread]="!n.isRead" (click)="open(n)">
+          <span class="dot"></span>
+          <div class="grow">
+            <strong>{{ n.title }}</strong>
+            <p>{{ n.body }}</p>
+            <span class="ts">{{ n.createdDate | date:'d MMM, HH:mm' }}</span>
+          </div>
+          @if (hasTarget(n)) { <ion-icon name="chevron-forward-outline" class="muted"></ion-icon> }
+        </button>
+      }
+    </div>
+  }
+</ion-content>

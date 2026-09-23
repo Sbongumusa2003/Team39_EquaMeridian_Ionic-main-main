@@ -1,0 +1,19 @@
+.hero { background:var(--eq-ink); color:#fff; border-color:var(--eq-ink); }
+.hero .no { font-size:.8rem; font-weight:700; letter-spacing:.06em; color:rgba(255,255,255,.7); }
+.hero .amt { font-size:2rem; font-weight:800; letter-spacing:-.02em; margin:10px 0 2px; color:var(--eq-gold); }
+.hero .sub { font-size:.86rem; color:rgba(255,255,255,.82); }
+.ch, .eft h3 { margin:0 0 10px; font-size:.95rem; font-weight:800; }
+.eft p, .ch + p { margin:0 0 10px; font-size:.84rem; line-height:1.45; }
+.copy { display:inline-flex; align-items:center; gap:6px; cursor:pointer; }
+.upload { display:flex; align-items:center; justify-content:center; gap:8px; margin-top:14px; border:1.5px dashed var(--eq-gold); background:var(--eq-gold-soft); border-radius:12px; padding:14px; font-weight:700; font-size:.9rem; cursor:pointer; }
+.waiting { display:flex; gap:12px; align-items:flex-start; background:var(--eq-info-bg); border-color:#c7d7fb; }
+.waiting ion-icon { font-size:24px; color:var(--eq-info); } .waiting p { margin:2px 0 0; font-size:.82rem; }
+.btns { display:flex; gap:8px; flex-wrap:wrap; } .btns ion-button { margin:0; flex:1; } .btns.col { flex-direction:column; }
+
+.replace { display:inline-block; margin-top:8px; font-size:.8rem; font-weight:700; color:var(--eq-info); text-decoration:underline; cursor:pointer; }
+.confirm { border-color:#efdcae; background:#fffdf7; }
+.chk { margin:0 0 14px; padding-left:20px; font-size:.86rem; line-height:1.5; color:var(--eq-ink-2); } .chk li { margin-bottom:6px; }
+
+.calc { display:block; font-style:normal; font-size:.74rem; color:#9a9384; margin-top:1px; }
+.kv.sub { font-weight:700; border-top:1px dashed var(--eq-line); } .kv.sub span:first-child { color:var(--eq-ink); }
+.green { color:var(--eq-ok) !important; }

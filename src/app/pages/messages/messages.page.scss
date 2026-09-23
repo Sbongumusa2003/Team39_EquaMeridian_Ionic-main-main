@@ -1,0 +1,6 @@
+.th { display:flex; gap:12px; align-items:center; padding:12px 14px; margin-bottom:10px; text-decoration:none; color:inherit; }
+.av { flex:0 0 44px; height:44px; border-radius:50%; background:var(--eq-ink); color:var(--eq-gold); display:flex; align-items:center; justify-content:center; font-weight:800; }
+.grow { flex:1; min-width:0; } .grow strong { font-size:.94rem; }
+.ts { font-size:.72rem; color:var(--eq-muted); flex:0 0 auto; }
+.pv { font-size:.82rem; color:var(--eq-muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.unread { background:var(--eq-gold); color:#111; font-size:.68rem; min-width:20px; height:20px; border-radius:10px; display:flex; align-items:center; justify-content:center; padding:0 6px; flex:0 0 auto; }

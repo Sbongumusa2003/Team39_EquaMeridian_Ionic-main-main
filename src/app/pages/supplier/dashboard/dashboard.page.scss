@@ -1,0 +1,7 @@
+.welcome { display:flex; justify-content:space-between; align-items:center; padding:16px 16px 12px; }
+.welcome span { font-size:.78rem; color:var(--eq-muted); font-weight:600; } .welcome h1 { margin:0; font-size:1.4rem; font-weight:800; letter-spacing:-.02em; }
+.kpis { padding-top:2px; } .tile .val.small { font-size:1.15rem; padding-top:6px; }
+.att { padding:0 16px; } .a { display:flex; align-items:center; gap:12px; padding:12px 14px; margin-bottom:8px; text-decoration:none; color:inherit; }
+.bolt { font-size:20px; color:var(--eq-gold-dark); background:var(--eq-gold-soft); padding:8px; border-radius:10px; }
+.grow { flex:1; min-width:0; } .grow strong { display:block; font-size:.92rem; } .grow span { font-size:.8rem; color:var(--eq-muted); }
+.tile .strong { font-size:.95rem; }

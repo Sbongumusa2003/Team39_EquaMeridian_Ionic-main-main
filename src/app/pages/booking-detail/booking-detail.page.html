@@ -1,0 +1,170 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start"><ion-back-button defaultHref="/tabs/bookings" text=""></ion-back-button></ion-buttons>
+    <ion-title>Booking #{{ bookingId }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-refresher slot="fixed" (ionRefresh)="load($event)"><ion-refresher-content></ion-refresher-content></ion-refresher>
+
+  @if (loading) {
+    <div class="page-pad"><div class="sk" style="height:120px;margin-bottom:12px"></div><div class="sk" style="height:200px"></div></div>
+  } @else if (!detail) {
+    <app-empty-state icon="cloud-offline-outline" title="Booking unavailable" [message]="error || 'This booking could not be found.'" actionLabel="Try again" (action)="load()"></app-empty-state>
+  } @else {
+    <div class="page-pad stack">
+
+      <!-- summary -->
+      <div class="eq-card pad">
+        <div class="between top">
+          <h1>{{ detail.machinery }}</h1>
+          <app-status-pill [status]="status"></app-status-pill>
+        </div>
+        <div class="meta"><ion-icon name="calendar-outline"></ion-icon>{{ detail.rentalStartDate | date:'d MMM' }} – {{ detail.rentalEndDate | date:'d MMM yyyy' }}</div>
+        <div class="meta"><ion-icon [name]="isSupplier ? 'person-outline' : 'business-outline'"></ion-icon>{{ isSupplier ? detail.contractorName : detail.supplierName }}</div>
+      </div>
+
+      <!-- next step -->
+      @if (headline; as h) {
+        <div class="eq-card pad next">
+          <div class="nx-ico"><ion-icon name="flash-outline"></ion-icon></div>
+          <div class="grow">
+            <strong>{{ h.title }}</strong>
+            <p>{{ h.body }}</p>
+            @if (h.cta) { <ion-button class="btn-gold" size="small" (click)="h.go?.()" [disabled]="acting">{{ h.cta }}</ion-button> }
+          </div>
+        </div>
+      }
+
+      <!-- inline forms opened by the next-step button or the action list -->
+      @if (panel === 'delivery' && canConfirmDelivery) {
+        <div class="eq-card pad form">
+          <h3>Confirm {{ isPickup ? 'collection' : 'delivery' }}</h3>
+          <ion-select label="Outcome" labelPlacement="floating" fill="outline" [(ngModel)]="deliveryOutcome" interface="popover" class="field">
+            <ion-select-option value="Accepted">Accepted — all good</ion-select-option>
+            <ion-select-option value="AcceptedWithNotes">Accepted with notes</ion-select-option>
+            <ion-select-option value="Rejected">Rejected</ion-select-option>
+          </ion-select>
+          <ion-textarea label="Notes (optional)" labelPlacement="floating" fill="outline" rows="3" [(ngModel)]="deliveryNotes" class="field"></ion-textarea>
+          <ion-button expand="block" class="btn-gold" (click)="confirmDelivery()" [disabled]="acting">Confirm</ion-button>
+        </div>
+      }
+
+      @if (panel === 'address' && canUpdateAddress) {
+        <div class="eq-card pad form">
+          <h3>Update delivery address</h3>
+          <ion-textarea label="Address" labelPlacement="floating" fill="outline" rows="3" [(ngModel)]="newAddress" class="field"></ion-textarea>
+          <ion-button expand="block" class="btn-gold" (click)="saveAddress()" [disabled]="acting">Save address</ion-button>
+        </div>
+      }
+
+      @if (panel === 'return' && canRequestReturn) {
+        <div class="eq-card pad form">
+          <h3>Request return</h3>
+          <ion-select label="Reason" labelPlacement="floating" fill="outline" placeholder="Select a reason" interface="popover" [(ngModel)]="returnReason" class="field">
+            @for (r of returnReasons; track r) { <ion-select-option [value]="r">{{ r }}</ion-select-option> }
+          </ion-select>
+          <div class="row-2">
+            <ion-input label="Pickup date" labelPlacement="floating" fill="outline" type="date" [min]="minDate" [(ngModel)]="preferredPickupDate" class="field"></ion-input>
+            <ion-select label="Time window" labelPlacement="floating" fill="outline" placeholder="Select" interface="popover" [(ngModel)]="pickupTimeWindow" class="field">
+              @for (w of pickupWindows; track w) { <ion-select-option [value]="w">{{ w }}</ion-select-option> }
+            </ion-select>
+          </div>
+          <ion-textarea label="Pickup location" labelPlacement="floating" fill="outline" rows="2" [(ngModel)]="pickupLocation" class="field"></ion-textarea>
+          <ion-textarea label="Notes (optional)" labelPlacement="floating" fill="outline" rows="2" [(ngModel)]="returnNotes" class="field"></ion-textarea>
+          <ion-button expand="block" class="btn-gold" (click)="submitReturnRequest()" [disabled]="acting">Submit request</ion-button>
+        </div>
+      }
+
+      @if (panel === 'confirmReturn' && canConfirmReturn) {
+        <div class="eq-card pad form">
+          <h3>Confirm return</h3>
+          <ion-select label="Condition" labelPlacement="floating" fill="outline" [(ngModel)]="returnCondition" interface="popover" class="field">
+            <ion-select-option value="Good">Good</ion-select-option>
+            <ion-select-option value="Minor wear">Fair (minor wear)</ion-select-option>
+            <ion-select-option value="Damaged">Damaged</ion-select-option>
+          </ion-select>
+          <ion-textarea label="Inspection notes" labelPlacement="floating" fill="outline" rows="3" maxlength="2000" [(ngModel)]="inspectionNotes" class="field"></ion-textarea>
+          @if (returnCondition === 'Damaged') {
+            <ion-textarea label="Damage description" labelPlacement="floating" fill="outline" rows="2" maxlength="2000" [(ngModel)]="damageDescription" class="field"></ion-textarea>
+            <ion-input label="Estimated repair cost (R)" labelPlacement="floating" fill="outline" type="number" inputmode="decimal" min="0" max="10000000" step="0.01" [(ngModel)]="estimatedRepairCost" class="field"></ion-input>
+          }
+          <label class="photo-btn">
+            <input type="file" accept="image/*" multiple hidden (change)="onPhotos($event)" />
+            <ion-icon name="camera-outline"></ion-icon>{{ returnPhotos.length ? returnPhotos.length + ' photo(s) added' : 'Add inspection photos' }}
+          </label>
+          @if (returnPhotos.length) {
+            <div class="photos">@for (p of returnPhotos; track p.name + $index) { <span>{{ p.name }}<button type="button" (click)="removePhoto($index)" aria-label="Remove"><ion-icon name="close-outline"></ion-icon></button></span> }</div>
+          }
+          <ion-button expand="block" class="btn-gold" (click)="submitConfirmReturn()" [disabled]="acting">Confirm return</ion-button>
+        </div>
+      }
+
+      @if (panel === 'review' && canLeaveReview) {
+        <div class="eq-card pad form">
+          <h3>Rate this hire</h3>
+          <div class="stars">@for (n of [1,2,3,4,5]; track n) { <button type="button" (click)="reviewRating = n" [attr.aria-label]="n + ' stars'"><ion-icon [name]="n <= reviewRating ? 'star' : 'star-outline'"></ion-icon></button> }</div>
+          <ion-input label="Title" labelPlacement="floating" fill="outline" [(ngModel)]="reviewTitle" class="field"></ion-input>
+          <ion-textarea label="Your review" labelPlacement="floating" fill="outline" rows="4" [(ngModel)]="reviewText" class="field"></ion-textarea>
+          <ion-button expand="block" class="btn-gold" (click)="submitReview()" [disabled]="acting">Submit review</ion-button>
+        </div>
+      }
+
+      @if (error) { <div class="form-error">{{ error }}</div> }
+
+      <!-- progress -->
+      @if (tracking?.stages?.length) {
+        <div class="eq-card pad">
+          <h3 class="ch">Progress</h3>
+          <div class="steps-v">
+            @for (s of tracking!.stages; track s.stage) {
+              <div class="step-v" [class.done]="s.isComplete" [class.current]="s.isCurrent">
+                <div class="dot"></div>
+                <div class="txt"><strong>{{ s.label || s.stage }}</strong>@if (s.timestamp) { <span>{{ s.timestamp | date:'d MMM, HH:mm' }}</span> }@if (s.notes) { <span>{{ s.notes }}</span> }</div>
+              </div>
+            }
+          </div>
+        </div>
+      }
+
+      <!-- fulfilment -->
+      <div class="eq-card pad">
+        <h3 class="ch">{{ isPickup ? 'Collection' : 'Delivery' }}</h3>
+        <div class="kv"><span>Method</span><span>{{ detail.deliveryMethod || '—' }}</span></div>
+        <div class="kv"><span>Status</span><span>{{ deliveryStatusLabel }}</span></div>
+        @if (detail.deliveryDate) { <div class="kv"><span>{{ isPickup ? 'Collected' : 'Delivered' }}</span><span>{{ detail.deliveryDate | date:'d MMM yyyy' }}</span></div> }
+        <div class="kv"><span>Address</span><span>{{ detail.deliveryAddress || '—' }}</span></div>
+        @if (pickupInProgress) { <div class="kv"><span>Return to</span><span>The address above, unless the supplier instructs otherwise</span></div> }
+      </div>
+
+      <!-- payment (contractor) -->
+      @if (payment) {
+        <div class="eq-card pad">
+          <h3 class="ch">Payment</h3>
+          <div class="kv"><span>Status</span><span><app-status-pill [status]="payment.status"></app-status-pill></span></div>
+          <div class="kv"><span>Amount due</span><span>{{ payment.amountDue | zar }}</span></div>
+          <div class="kv"><span>Paid so far</span><span>{{ payment.amountPaid | zar }}</span></div>
+        </div>
+      }
+
+      <!-- documents -->
+      <div class="eq-card docs">
+        <button type="button" (click)="openLease()"><ion-icon name="document-text-outline"></ion-icon><span>Lease agreement</span></button>
+        <button type="button" (click)="openInvoice()"><ion-icon name="receipt-outline"></ion-icon><span>Invoice</span></button>
+        @if (invoice) { <button type="button" (click)="downloadInvoice()"><ion-icon name="download-outline"></ion-icon><span>Download invoice PDF</span></button> }
+        <button type="button" (click)="addToCalendar()"><ion-icon name="calendar-outline"></ion-icon><span>Add to calendar</span></button>
+      </div>
+
+      <!-- other actions -->
+      @if (canUpdateAddress || canRequestReturn || canRaiseDispute || canCancel) {
+        <div class="actions">
+          @if (canUpdateAddress) { <ion-button fill="outline" expand="block" (click)="togglePanel('address')">Update delivery address</ion-button> }
+          @if (canRequestReturn) { <ion-button fill="outline" expand="block" (click)="togglePanel('return')">Request return</ion-button> }
+          @if (canRaiseDispute) { <ion-button fill="outline" color="danger" expand="block" (click)="goDispute()">Raise a dispute</ion-button> }
+          @if (canCancel) { <ion-button fill="clear" color="medium" expand="block" (click)="cancelBooking()" [disabled]="acting">Cancel booking</ion-button> }
+        </div>
+      }
+    </div>
+  }
+</ion-content>

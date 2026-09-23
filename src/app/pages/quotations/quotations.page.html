@@ -1,0 +1,44 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>{{ isSupplier ? 'Quote requests' : 'Quotations' }}</ion-title>
+    <ion-buttons slot="end"><app-header-actions></app-header-actions></ion-buttons>
+  </ion-toolbar>
+  <div class="chip-scroll filters">
+    @for (f of filters; track f.key) { <button type="button" class="chip" [class.on]="filter === f.key" (click)="filter = f.key">{{ f.label }}</button> }
+  </div>
+</ion-header>
+<ion-content>
+  <ion-refresher slot="fixed" (ionRefresh)="load($event)"><ion-refresher-content></ion-refresher-content></ion-refresher>
+  @if (loading) {
+    <div class="page-pad">@for (i of [1,2,3]; track i) { <div class="sk" style="height:96px;margin-bottom:12px"></div> }</div>
+  } @else if (error) {
+    <app-empty-state icon="cloud-offline-outline" title="Couldn't load quotations" [message]="error" actionLabel="Try again" (action)="load()"></app-empty-state>
+  } @else if (!items.length) {
+    <app-empty-state icon="document-text-outline" title="No quotations yet"
+      [message]="isSupplier ? 'Quote requests from contractors will appear here.' : 'Open a quote-only machine and request a quote from the supplier.'"
+      [actionLabel]="isSupplier ? '' : 'Browse machinery'" actionLink="/tabs/browse"></app-empty-state>
+  } @else {
+    @if (needsAttention) { <div class="banner">{{ needsAttention }} {{ isSupplier ? 'request' : 'quote' }}{{ needsAttention === 1 ? '' : 's' }} {{ isSupplier ? 'waiting for your price' : 'waiting for your decision' }}</div> }
+    <div class="page-pad list">
+      @for (q of shown; track q.quotationID) {
+        <a class="eq-card q" [routerLink]="['/tabs/quotations', q.quotationID]">
+          <div class="between"><strong>{{ q.listingTitle }}</strong><app-status-pill [status]="q.status"></app-status-pill></div>
+          <span class="who">{{ isSupplier ? q.contractorName : q.supplierName }}</span>
+          @if (q.rentalStartDate) { <span class="when"><ion-icon name="calendar-outline"></ion-icon>{{ q.rentalStartDate | date:'d MMM' }} – {{ q.rentalEndDate | date:'d MMM yyyy' }}@if (q.quantity) { · ×{{ q.quantity }} }</span> }
+          <div class="between b">
+            <span class="d">Requested {{ q.requestedDate | date:'d MMM' }}</span>
+            @if (q.estimatedTotal) { <span class="price">{{ q.estimatedTotal | zar:0 }}</span> }
+          </div>
+          @if (!isSupplier) {
+            <button type="button" class="cmp" [class.on]="compareIds.has(q.quotationID)" (click)="toggleCompare(q.quotationID, $event)">
+              <ion-icon [name]="compareIds.has(q.quotationID) ? 'checkmark-circle' : 'ellipse-outline'"></ion-icon> Compare
+            </button>
+          }
+        </a>
+      } @empty { <p class="muted center-t">Nothing in this view.</p> }
+    </div>
+  }
+  @if (compareIds.size > 0) {
+    <div class="compare-bar"><span>{{ compareIds.size }} selected · pick 2–4</span><ion-button size="small" class="btn-gold" (click)="goCompare()" [disabled]="compareIds.size < 2">Compare</ion-button></div>
+  }
+</ion-content>

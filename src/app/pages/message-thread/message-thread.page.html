@@ -1,0 +1,35 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start"><ion-back-button defaultHref="/tabs/messages" text=""></ion-back-button></ion-buttons>
+    <ion-title>{{ title }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+<ion-content>
+  @if (loading) {
+    <div class="page-pad"><div class="sk" style="height:48px;width:60%;margin-bottom:10px"></div><div class="sk" style="height:48px;width:50%;margin:0 0 10px auto"></div></div>
+  } @else if (error) {
+    <app-empty-state icon="cloud-offline-outline" title="Conversation unavailable" [message]="error" actionLabel="Try again" (action)="load()"></app-empty-state>
+  } @else {
+    <div class="msgs">
+      @for (m of messages; track m.messageID) {
+        <div class="bubble" [class.mine]="isMine(m)">
+          @if (m.body) { <div class="text">{{ m.body }}</div> }
+          @if (m.attachmentURL) { <a class="att" [href]="attachHref(m)" target="_blank" rel="noopener">📎 {{ m.attachmentFileName || 'Attachment' }}</a> }
+          <div class="time">{{ m.dateSent | date:'d MMM, HH:mm' }}</div>
+        </div>
+      } @empty { <p class="muted first">Say hello — this is the start of your conversation.</p> }
+    </div>
+  }
+</ion-content>
+<ion-footer class="ion-no-border">
+  <ion-toolbar>
+    @if (attachment) { <div class="chipfile">📎 {{ attachment.name }} <button type="button" (click)="attachment = null" aria-label="Remove">✕</button></div> }
+    <div class="composer">
+      <label class="attach"><input type="file" hidden (change)="onFile($event)" /><ion-icon name="attach-outline"></ion-icon></label>
+      <input class="in" [(ngModel)]="body" placeholder="Write a message…" (keyup.enter)="send()" />
+      <ion-button class="btn-gold snd" (click)="send()" [disabled]="sending || (!body.trim() && !attachment)">
+        @if (sending) { <ion-spinner name="crescent"></ion-spinner> } @else { <ion-icon slot="icon-only" name="send-outline"></ion-icon> }
+      </ion-button>
+    </div>
+  </ion-toolbar>
+</ion-footer>

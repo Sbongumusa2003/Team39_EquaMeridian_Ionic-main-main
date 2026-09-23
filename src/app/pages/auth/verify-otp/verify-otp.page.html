@@ -1,0 +1,14 @@
+<ion-header><ion-toolbar>
+  <ion-buttons slot="start"><ion-back-button defaultHref="/auth/login"></ion-back-button></ion-buttons>
+  <ion-title>Verify code</ion-title>
+</ion-toolbar></ion-header>
+<ion-content class="ion-padding">
+  <h1>Two-factor verification</h1>
+  <p>Enter the one-time code we sent you.</p>
+  <ion-item><ion-input label="Code" labelPlacement="stacked" [(ngModel)]="code" inputmode="numeric"></ion-input></ion-item>
+  @if (error) { <ion-text color="danger"><p>{{ error }}</p></ion-text> }
+  <ion-button expand="block" class="btn-gold" (click)="submit()" [disabled]="loading">
+    @if (loading) { <ion-spinner></ion-spinner> } @else { Verify & continue }
+  </ion-button>
+  <ion-button expand="block" fill="clear" (click)="resend()" [disabled]="resending">Resend code</ion-button>
+</ion-content>

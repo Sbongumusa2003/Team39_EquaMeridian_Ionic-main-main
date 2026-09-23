@@ -1,0 +1,5 @@
+.banner { display:flex; align-items:center; gap:8px; margin:14px 16px 0; padding:11px 14px; background:var(--eq-gold-soft); color:#7a5a12; border-radius:12px; font-size:.84rem; font-weight:700; }
+.list { padding-top:12px; }
+.lease { display:flex; flex-direction:column; gap:3px; padding:14px; margin-bottom:10px; text-decoration:none; color:inherit; }
+.no { font-size:.76rem; color:var(--eq-muted); font-weight:600; }
+.when { display:flex; align-items:center; gap:5px; font-size:.8rem; color:var(--eq-ink-2); margin-top:4px; }
