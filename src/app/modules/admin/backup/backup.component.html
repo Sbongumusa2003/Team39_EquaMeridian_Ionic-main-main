@@ -1,0 +1,108 @@
+<div class="page-header page-header--row">
+  <div class="page-header__main">
+    <div class="page-header__title">
+      <h1>Backup &amp; Restore</h1>
+    </div>
+    <div class="page-header__sub">
+      <p>
+        Create local logical JSON snapshots of core marketplace data and restore them
+        when needed. Ideal for local development and disaster recovery of app data.
+      </p>
+    </div>
+  </div>
+  <div class="page-header__actions">
+    <button class="btn btn--primary" [disabled]="creating" (click)="createBackup()">
+      {{ creating ? 'Creating...' : '+ Create Backup' }}
+    </button>
+  </div>
+</div>
+
+<div class="alert alert--warning mb-16">
+  <strong>Heads up:</strong> Restore is destructive. It truncates operational tables and
+  reloads them from the selected snapshot. Active users may be disconnected and will need
+  to sign in again. Only restore from a backup you trust.
+</div>
+
+<div class="alert alert--info mb-16">
+  Backups are stored on the API host under <code>Backup:Directory</code>
+  (default <code>/tmp/EquaMeridianBackups</code>). On Render the disk is ephemeral unless you
+  attach a persistent disk — download important backups to your machine.
+</div>
+
+<div class="alert alert--success" *ngIf="message">{{ message }}</div>
+<div class="alert alert--error" *ngIf="error">{{ error }}</div>
+
+<div class="panel">
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>FILE NAME</th>
+          <th>SIZE</th>
+          <th>CREATED</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngIf="loading">
+          <td colspan="4" class="text-center">Loading...</td>
+        </tr>
+        <tr *ngFor="let b of backups">
+          <td class="text-break">{{ b.fileName }}</td>
+          <td>{{ formatSize(b.sizeBytes) }}</td>
+          <td>{{ b.createdAtUtc | date:'dd MMM yyyy HH:mm':'Africa/Johannesburg' }}</td>
+          <td>
+            <div class="action-cell">
+              <button type="button" class="btn btn--sm btn--outline" (click)="download(b)">
+                Download
+              </button>
+              <button type="button" class="btn btn--sm btn--danger-outline" (click)="openRestore(b)">
+                Restore
+              </button>
+              <button
+                type="button"
+                class="btn btn--sm btn--ghost"
+                [disabled]="deletingName === b.fileName"
+                (click)="deleteBackup(b)">
+                {{ deletingName === b.fileName ? 'Deleting...' : 'Delete' }}
+              </button>
+            </div>
+          </td>
+        </tr>
+        <tr *ngIf="!loading && backups.length === 0">
+          <td colspan="4" class="text-center">No backups yet. Click “Create Backup” to start.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="modal-overlay" *ngIf="restoreTarget" (click)="closeRestore()">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <h3 class="detail-title">Restore Database</h3>
+    <p class="text-muted">
+      This will overwrite the live database with the contents of
+      <strong>{{ restoreTarget.fileName }}</strong>. This cannot be undone.
+    </p>
+    <div class="form-group">
+      <label>Type the file name to confirm</label>
+      <input
+        type="text"
+        [(ngModel)]="restoreConfirmText"
+        [placeholder]="restoreTarget.fileName"
+        autocomplete="off" />
+    </div>
+    <div class="form-actions">
+      <button type="button" class="btn btn--ghost" (click)="closeRestore()" [disabled]="restoring">
+        Cancel
+      </button>
+      <button
+        type="button"
+        class="btn btn--danger"
+        [disabled]="restoring || restoreConfirmText !== restoreTarget.fileName"
+        (click)="confirmRestore()">
+        {{ restoring ? 'Restoring...' : 'Confirm Restore' }}
+      </button>
+    </div>
+  </div>
+</div>

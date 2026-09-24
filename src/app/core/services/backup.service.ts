@@ -21,4 +21,34 @@ export class BackupService {
   restore(dto: RestoreBackupRequest): Observable<{ message: string }> {
     return this.http.post<{ message: string }>(`${this.apiUrl}/restore`, dto);
   }
+
+  delete(fileName: string): Observable<{ message: string }> {
+    return this.http.delete<{ message: string }>(
+      `${this.apiUrl}/${encodeURIComponent(fileName)}`
+    );
+  }
+
+  /** Triggers a browser download of the backup JSON file. */
+  download(fileName: string): void {
+    const token = localStorage.getItem('token') || sessionStorage.getItem('token') || '';
+    const url = `${this.apiUrl}/${encodeURIComponent(fileName)}`;
+    fetch(url, {
+      headers: token ? { Authorization: `Bearer ${token}` } : {}
+    })
+      .then(res => {
+        if (!res.ok) throw new Error('Download failed');
+        return res.blob();
+      })
+      .then(blob => {
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = fileName;
+        a.click();
+        URL.revokeObjectURL(a.href);
+      })
+      .catch(() => {
+        // Fallback: open in new tab (auth may still apply via cookies if any)
+        window.open(url, '_blank');
+      });
+  }
 }
