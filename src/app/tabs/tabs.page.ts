@@ -4,10 +4,11 @@ import { IonTabs, IonTabBar, IonTabButton, IonIcon, IonLabel, IonBadge } from '@
 import { addIcons } from 'ionicons';
 import {
   homeOutline, searchOutline, personOutline, calendarOutline, cartOutline,
-  storefrontOutline, cubeOutline, documentTextOutline
+  storefrontOutline, cubeOutline, documentTextOutline, notificationsOutline
 } from 'ionicons/icons';
 import { AuthService } from '../core/services/auth.service';
 import { CartService } from '../core/services/cart.service';
+import { NotificationService } from '../core/services/notification.service';
 
 @Component({
   standalone: true,
@@ -18,9 +19,14 @@ import { CartService } from '../core/services/cart.service';
 export class TabsPage {
   auth = inject(AuthService);
   cart = inject(CartService);
+  notes = inject(NotificationService);
   role$ = this.auth.currentUser$;
+  unread$ = this.notes.unreadCount$;
 
   constructor() {
-    addIcons({ homeOutline, searchOutline, personOutline, calendarOutline, cartOutline, storefrontOutline, cubeOutline, documentTextOutline });
+    addIcons({
+      homeOutline, searchOutline, personOutline, calendarOutline, cartOutline,
+      storefrontOutline, cubeOutline, documentTextOutline, notificationsOutline
+    });
   }
 }

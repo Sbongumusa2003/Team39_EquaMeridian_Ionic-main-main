@@ -6,6 +6,7 @@ import { PushNotificationService } from './core/services/push-notification.servi
 import { CartService } from './core/services/cart.service';
 import { WishlistService } from './core/services/wishlist.service';
 import { NotificationService } from './core/services/notification.service';
+import { AppToastService } from './core/services/toast.service';
 
 @Component({
   standalone: true,
@@ -19,6 +20,7 @@ export class AppComponent implements OnInit, OnDestroy {
   private cart = inject(CartService);
   private wishlist = inject(WishlistService);
   private notes = inject(NotificationService);
+  private toast = inject(AppToastService);
   private subs = new Subscription();
 
   ngOnInit() {
@@ -32,8 +34,19 @@ export class AppComponent implements OnInit, OnDestroy {
         this.wishlist.clear();
       }
     }));
-    // Light polling keeps the bell + cart badge honest without a websocket.
-    this.subs.add(interval(60_000).subscribe(() => { if (this.auth.isLoggedIn) this.notes.refreshUnreadCount(); }));
+
+    // Poll every 30s so suppliers/contractors see in-app updates promptly.
+    this.subs.add(interval(30_000).subscribe(() => {
+      if (this.auth.isLoggedIn) this.notes.refreshUnreadCount();
+    }));
+
+    // Toast each newly arrived in-app notification (bookings, quotes, listings, etc.).
+    this.subs.add(this.notes.newNotifications$.subscribe(items => {
+      for (const n of items) {
+        const msg = n.title ? `${n.title}${n.body ? ': ' + n.body : ''}` : (n.body || 'New update');
+        void this.toast.success(msg.length > 140 ? msg.slice(0, 137) + '…' : msg);
+      }
+    }));
   }
 
   private refreshBadges() {
