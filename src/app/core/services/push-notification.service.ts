@@ -33,27 +33,18 @@ export class PushNotificationService {
     }
     if (!this.auth.isLoggedIn) return;
 
-    // Missing google-services.json / FCM must not crash the app.
-    // In-app notifications (API polling) still work without remote push.
-    try {
-      await this.attachListeners();
+    await this.attachListeners();
 
-      let perm = await PushNotifications.checkPermissions();
-      if (perm.receive === 'prompt' || perm.receive === 'prompt-with-rationale') {
-        perm = await PushNotifications.requestPermissions();
-      }
-      if (perm.receive !== 'granted') {
-        console.warn('[Push] Permission not granted');
-        return;
-      }
-
-      await PushNotifications.register();
-    } catch (e) {
-      console.error(
-        '[Push] Init failed (app will keep running without remote push)',
-        e
-      );
+    let perm = await PushNotifications.checkPermissions();
+    if (perm.receive === 'prompt' || perm.receive === 'prompt-with-rationale') {
+      perm = await PushNotifications.requestPermissions();
     }
+    if (perm.receive !== 'granted') {
+      console.warn('[Push] Permission not granted');
+      return;
+    }
+
+    await PushNotifications.register();
   }
 
   async detach(): Promise<void> {
@@ -64,9 +55,7 @@ export class PushNotificationService {
             body: { token: this.lastToken }
           })
         );
-      } catch {
-        /* ignore */
-      }
+      } catch { /* ignore */ }
     }
     this.lastToken = null;
   }
@@ -119,11 +108,7 @@ export class PushNotificationService {
   private navigateFromNotification(n: PushNotificationSchema): void {
     const data = (n.data || {}) as Record<string, string>;
     const type = (data['type'] || data['Type'] || '').toLowerCase();
-    const refId =
-      data['referenceId'] ||
-      data['ReferenceId'] ||
-      data['bookingId'] ||
-      data['BookingId'];
+    const refId = data['referenceId'] || data['ReferenceId'] || data['bookingId'] || data['BookingId'];
     const entity = (data['entityType'] || data['EntityType'] || '').toLowerCase();
 
     if (entity === 'booking' && refId) {
